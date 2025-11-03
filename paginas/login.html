@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>EasyPark - Login</title>
+    <title>EasyPark - Login Escolar</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html,body { height: 100%; }
@@ -97,7 +97,7 @@
     <div class="auth-card">
         
         <h1>Login Escolar</h1>
-        <form action="login.php" method="post">
+        <form action="../api/verifi_login.php" method="post">
             <label for="email">Email institucional</label>
             <input 
                 type="email" 
@@ -105,9 +105,9 @@
                 name="email" 
                 placeholder="numeroIps@estudantes.ips.pt" 
                 required
-                pattern="[0-9]+@estudantes\.ips\.pt"
+                pattern="([0-9]+@estudantes\.ips\.pt|admin@estudantes.ips.pt)"
                 title="Apenas emails do domínio estudantes.ips.pt são permitidos.">
-            
+             
             <label for="password">Palavra-passe</label>
             <input 
                 type="password" 
