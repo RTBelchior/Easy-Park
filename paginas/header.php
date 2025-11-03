@@ -5,6 +5,7 @@
     <nav class="header-nav">
         <a href="/Easy-Park/index.php">Início</a>
         <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
+        <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
         <a href="/Easy-Park/paginas/login.php">Login</a>
     </nav>
   </div>

@@ -181,18 +181,40 @@
         }
 
         /* Filtros de Parques */
-        .parking-filters {
+       .parking-filters {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .total-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #3b82f6;
+            border-radius: 20px;
+            padding: 10px 30px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #1e3a8a;
+            font-size: 24px;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        .parking-subfilters {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
-            margin-top: 30px;
         }
 
         .filter-card {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 15px;
-            padding: 20px;
+            padding: 15px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -217,7 +239,8 @@
         .filter-card .name {
             font-size: 18px;
             font-weight: bold;
-            color: white;
+            color: #1e3a8a;
+            ;
             margin-bottom: 5px;
         }
 
@@ -228,7 +251,7 @@
         .filter-card .count {
             font-size: 24px;
             font-weight: bold;
-            color: white;
+            color: #3b82f6;
         }
 
         .filter-card.active .count {
@@ -370,22 +393,33 @@
 
                 <!-- Filtros de Parques -->
                 <div class="parking-filters">
-                    <div class="filter-card active" onclick="filterParking('all')">
+
+                    <!-- BLOCO DE "TODOS" EM CIMA -->
+                    <div class="filter-card total-card active" onclick="filterParking('all')">
                         <div class="icon">🅿️</div>
                         <div class="name">Todos</div>
                         <div class="count" id="count-all">--</div>
                     </div>
-                    
-                    <div class="filter-card" onclick="filterParking('north')">
-                        <div class="icon">🗺️</div>
-                        <div class="name">Parque Norte</div>
-                        <div class="count" id="count-north">--</div>
-                    </div>
-                    
-                    <div class="filter-card" onclick="filterParking('south')">
-                        <div class="icon">🗺️</div>
-                        <div class="name">Parque Sul</div>
-                        <div class="count" id="count-south">--</div>
+
+                    <!-- BLOCO DOS OUTROS PARQUES EM BAIXO -->
+                    <div class="parking-subfilters">
+                        <div class="filter-card" onclick="filterParking('1')">
+                            <div class="icon">🗺️</div>
+                            <div class="name">Parque 1</div>
+                            <div class="count" id="count-1">--</div>
+                        </div>
+
+                        <div class="filter-card" onclick="filterParking('2')">
+                            <div class="icon">🗺️</div>
+                            <div class="name">Parque 2</div>
+                            <div class="count" id="count-2">--</div>
+                        </div>
+
+                        <div class="filter-card" onclick="filterParking('3')">
+                            <div class="icon">🗺️</div>
+                            <div class="name">Parque 3</div>
+                            <div class="count" id="count-3">--</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -417,8 +451,9 @@
     <script>
         let parkingData = {
             all: 0,
-            north: 0,
-            south: 0
+            1: 0,
+            2: 0,
+            3: 0
         };
 
         let currentFilter = 'all';
@@ -433,6 +468,11 @@
                 
                 // Buscar dados de todos os parques
                 const response = await fetch('api/get_disponibilidade.php');
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
                 const responseText = await response.text();
                 console.log('Resposta do servidor:', responseText);
                 
@@ -440,57 +480,69 @@
                 try {
                     data = JSON.parse(responseText);
                 } catch (e) {
-                    throw new Error('Resposta inválida do servidor. Verifique o console do navegador.');
+                    console.error('Erro ao fazer parse do JSON:', e);
+                    console.error('Resposta recebida:', responseText);
+                    throw new Error('Resposta inválida do servidor. Verifique o console.');
                 }
                 
                 if (data.success) {
-                    // Atualizar dados (aqui você pode ajustar para buscar múltiplos parques)
-                    const disponivel = data.lotacao_maxima - data.lotacao_atual;
-                    
-                    // Simular dados para os diferentes parques
-                    // TODO: Modificar o PHP para retornar dados de todos os parques
-                    parkingData.all = disponivel;
-                    parkingData.north = Math.floor(disponivel * 0.6);
-                    parkingData.south = disponivel - parkingData.north;
+                    // Atualizar dados de cada parque
+                    parkingData.all = data.total.disponivel;
+                    parkingData[1] = data.parques[1] ? data.parques[1].disponivel : 0;
+                    parkingData[2] = data.parques[2] ? data.parques[2].disponivel : 0;
+                    parkingData[3] = data.parques[3] ? data.parques[3].disponivel : 0;
                     
                     updateAllDisplays();
-                    console.log('Dados carregados com sucesso:', data);
+                    console.log('Dados carregados com sucesso:', parkingData);
+                    
+                    if (statusMsg) {
+                        statusMsg.innerHTML = '<span class="success">✓ Dados atualizados</span>';
+                    }
                 } else {
                     throw new Error(data.error || 'Erro desconhecido');
                 }
                 
             } catch (error) {
                 console.error('Erro completo:', error);
-                updateDisplay(0, false, error.message);
+                if (statusMsg) {
+                    statusMsg.innerHTML = `<span class="error">✗ ${error.message}</span>`;
+                }
+                // Manter os valores atuais em caso de erro
             }
         }
 
         function updateAllDisplays() {
             // Atualizar contadores dos filtros
             document.getElementById('count-all').textContent = parkingData.all;
-            document.getElementById('count-north').textContent = parkingData.north;
-            document.getElementById('count-south').textContent = parkingData.south;
+            document.getElementById('count-1').textContent = parkingData[1];
+            document.getElementById('count-2').textContent = parkingData[2];
+            document.getElementById('count-3').textContent = parkingData[3];
             
             // Atualizar display principal
-            updateDisplay(parkingData[currentFilter], true);
+            updateMainDisplay();
         }
 
-        function updateDisplay(available, success, errorMessage = '') {
+        function updateMainDisplay() {
             const display = document.getElementById('availableSpots');
-            const statusMsg = document.getElementById('statusMessage');
+            const parkingName = document.getElementById('parkingName');
             
+            const names = {
+                'all': 'todos os parques',
+                '1': 'Parque 1',
+                '2': 'Parque 2',
+                '3': 'Parque 3'
+            };
+            
+            // Atualizar número com animação
             display.style.animation = 'none';
             setTimeout(() => {
-                display.textContent = available;
+                display.textContent = parkingData[currentFilter];
                 display.style.animation = 'pulse 2s ease-in-out infinite';
             }, 10);
             
-            if (statusMsg) {
-                if (success) {
-                    statusMsg.innerHTML = '<span class="success">✓ Dados atualizados</span>';
-                } else {
-                    statusMsg.innerHTML = `<span class="error">✗ ${errorMessage || 'Erro ao carregar dados'}</span>`;
-                }
+            // Atualizar nome
+            if (parkingName) {
+                parkingName.textContent = names[currentFilter] || 'todos os parques';
             }
         }
 
@@ -505,21 +557,13 @@
             // Adicionar classe active ao clicado
             event.currentTarget.classList.add('active');
             
-            // Atualizar nome do parque
-            const parkingName = document.getElementById('parkingName');
-            const names = {
-                'all': 'todos os parques',
-                'north': 'Parque Norte',
-                'south': 'Parque Sul'
-            };
-            parkingName.textContent = names[type];
-            
-            // Atualizar display com o valor filtrado
-            updateDisplay(parkingData[type], true);
+            // Atualizar display principal
+            updateMainDisplay();
         }
 
         // Atualizar ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página carregada, iniciando busca de dados...');
             fetchAvailableSpots();
             
             // Atualizar automaticamente a cada 30 segundos
