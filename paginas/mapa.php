@@ -103,7 +103,7 @@
     }
 
     .map-card {
-      margin-top: 12%;
+      margin-top: 7%;
       background: rgba(255, 255, 255, 0.95);
       border-radius: 20px;
       overflow: hidden;
@@ -232,10 +232,10 @@
   <header>
     <div class="logo">EasyPark</div>
     <nav>
-      <a href="../index.html">Início</a>
-      <a href="formulario.html">Sugestões</a>
-      <a href="mapa.html">Parques</a>
-      <a href="login.html">Login</a>
+      <a href="../index.php">Início</a>
+      <a href="formulario.php">Sugestões</a>
+      <a href="mapa.php">Parques</a>
+      <a href="login.php">Login</a>
     </nav>
   </header>
 
