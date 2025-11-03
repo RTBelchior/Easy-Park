@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,14 +22,6 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            animation: slideDown 0.8s ease;
         }
 
         .logo {
@@ -191,39 +182,17 @@
 
         /* Filtros de Parques */
         .parking-filters {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .total-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.95);
-            border: 3px solid #3b82f6;
-            border-radius: 20px;
-            padding: 10px 30px;
-            font-size: 22px;
-            font-weight: bold;
-            color: #1e3a8a;
-            font-size: 24px;
-            justify-content: center;
-            gap: 40px;
-        }
-
-        .parking-subfilters {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
+            margin-top: 30px;
         }
 
         .filter-card {
             background: rgba(255, 255, 255, 0.1);
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 15px;
-            padding: 15px;
+            padding: 20px;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
@@ -248,8 +217,7 @@
         .filter-card .name {
             font-size: 18px;
             font-weight: bold;
-            color: #1e3a8a;
-            ;
+            color: white;
             margin-bottom: 5px;
         }
 
@@ -260,7 +228,7 @@
         .filter-card .count {
             font-size: 24px;
             font-weight: bold;
-            color: #3b82f6;
+            color: white;
         }
 
         .filter-card.active .count {
@@ -310,7 +278,6 @@
                 opacity: 0;
                 transform: translateY(-50px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -322,7 +289,6 @@
                 opacity: 0;
                 transform: translateX(-50px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -334,7 +300,6 @@
                 opacity: 0;
                 transform: translateX(50px);
             }
-
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -345,19 +310,15 @@
             from {
                 opacity: 0;
             }
-
             to {
                 opacity: 1;
             }
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
+            0%, 100% {
                 transform: scale(1);
             }
-
             50% {
                 transform: scale(1.05);
             }
@@ -373,8 +334,7 @@
                 font-size: 36px;
             }
 
-            .features,
-            .parking-filters {
+            .features, .parking-filters {
                 grid-template-columns: 1fr;
             }
 
@@ -384,18 +344,9 @@
         }
     </style>
 </head>
-
 <body>
+    <?php include('paginas/header.php'); ?>
     <div class="container">
-        <header>
-            <div class="logo">EasyPark</div>
-            <nav>
-                <a href="index.html">Início</a>
-                <a href="paginas/formulario.html">Sugestões</a>
-                <a href="paginas/mapa.html">Parques</a>
-                <a href="paginas/login.html">Login</a>
-            </nav>
-        </header>
 
         <section class="hero">
             <div class="hero-content">
@@ -419,36 +370,24 @@
 
                 <!-- Filtros de Parques -->
                 <div class="parking-filters">
-
-                    <!-- BLOCO DE "TODOS" EM CIMA -->
-                    <div class="filter-card total-card active" onclick="filterParking('all')">
+                    <div class="filter-card active" onclick="filterParking('all')">
                         <div class="icon">🅿️</div>
                         <div class="name">Todos</div>
                         <div class="count" id="count-all">--</div>
                     </div>
-
-                    <!-- BLOCO DOS OUTROS PARQUES EM BAIXO -->
-                    <div class="parking-subfilters">
-                        <div class="filter-card" onclick="filterParking('1')">
-                            <div class="icon">🗺️</div>
-                            <div class="name">Parque 1</div>
-                            <div class="count" id="count-1">--</div>
-                        </div>
-
-                        <div class="filter-card" onclick="filterParking('2')">
-                            <div class="icon">🗺️</div>
-                            <div class="name">Parque 2</div>
-                            <div class="count" id="count-2">--</div>
-                        </div>
-
-                        <div class="filter-card" onclick="filterParking('3')">
-                            <div class="icon">🗺️</div>
-                            <div class="name">Parque 3</div>
-                            <div class="count" id="count-3">--</div>
-                        </div>
+                    
+                    <div class="filter-card" onclick="filterParking('north')">
+                        <div class="icon">🗺️</div>
+                        <div class="name">Parque Norte</div>
+                        <div class="count" id="count-north">--</div>
+                    </div>
+                    
+                    <div class="filter-card" onclick="filterParking('south')">
+                        <div class="icon">🗺️</div>
+                        <div class="name">Parque Sul</div>
+                        <div class="count" id="count-south">--</div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -473,52 +412,53 @@
         </section>
     </div>
 
+    <?php include('footer.php'); ?>
+
     <script>
         let parkingData = {
             all: 0,
-            '1': 0,
-            '2': 0,
-            '3': 0
+            north: 0,
+            south: 0
         };
 
         let currentFilter = 'all';
 
         async function fetchAvailableSpots() {
             const statusMsg = document.getElementById('statusMessage');
-
+            
             try {
                 if (statusMsg) {
                     statusMsg.innerHTML = '<span class="loading">A carregar dados...</span>';
                 }
-
+                
                 // Buscar dados de todos os parques
                 const response = await fetch('api/get_disponibilidade.php');
                 const responseText = await response.text();
                 console.log('Resposta do servidor:', responseText);
-
+                
                 let data;
                 try {
                     data = JSON.parse(responseText);
                 } catch (e) {
                     throw new Error('Resposta inválida do servidor. Verifique o console do navegador.');
                 }
-
-                if (data.success && data.parques) {
-                    // Atualizar dados do total
-                    parkingData.all = data.total.disponivel;
-
-                    // Atualizar dados de cada parque individual
-                    parkingData['1'] = data.parques[1] ? data.parques[1].disponivel : 0;
-                    parkingData['2'] = data.parques[2] ? data.parques[2].disponivel : 0;
-                    parkingData['3'] = data.parques[3] ? data.parques[3].disponivel : 0;
-
+                
+                if (data.success) {
+                    // Atualizar dados (aqui você pode ajustar para buscar múltiplos parques)
+                    const disponivel = data.lotacao_maxima - data.lotacao_atual;
+                    
+                    // Simular dados para os diferentes parques
+                    // TODO: Modificar o PHP para retornar dados de todos os parques
+                    parkingData.all = disponivel;
+                    parkingData.north = Math.floor(disponivel * 0.6);
+                    parkingData.south = disponivel - parkingData.north;
+                    
                     updateAllDisplays();
                     console.log('Dados carregados com sucesso:', data);
-                    console.log('Parques processados:', parkingData);
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido ao carregar parques');
+                    throw new Error(data.error || 'Erro desconhecido');
                 }
-
+                
             } catch (error) {
                 console.error('Erro completo:', error);
                 updateDisplay(0, false, error.message);
@@ -528,10 +468,9 @@
         function updateAllDisplays() {
             // Atualizar contadores dos filtros
             document.getElementById('count-all').textContent = parkingData.all;
-            document.getElementById('count-1').textContent = parkingData['1'];
-            document.getElementById('count-2').textContent = parkingData['2'];
-            document.getElementById('count-3').textContent = parkingData['3'];
-
+            document.getElementById('count-north').textContent = parkingData.north;
+            document.getElementById('count-south').textContent = parkingData.south;
+            
             // Atualizar display principal
             updateDisplay(parkingData[currentFilter], true);
         }
@@ -539,13 +478,13 @@
         function updateDisplay(available, success, errorMessage = '') {
             const display = document.getElementById('availableSpots');
             const statusMsg = document.getElementById('statusMessage');
-
+            
             display.style.animation = 'none';
             setTimeout(() => {
                 display.textContent = available;
                 display.style.animation = 'pulse 2s ease-in-out infinite';
             }, 10);
-
+            
             if (statusMsg) {
                 if (success) {
                     statusMsg.innerHTML = '<span class="success">✓ Dados atualizados</span>';
@@ -557,37 +496,35 @@
 
         function filterParking(type) {
             currentFilter = type;
-
+            
             // Remover classe active de todos
             document.querySelectorAll('.filter-card').forEach(card => {
                 card.classList.remove('active');
             });
-
+            
             // Adicionar classe active ao clicado
             event.currentTarget.classList.add('active');
-
+            
             // Atualizar nome do parque
             const parkingName = document.getElementById('parkingName');
             const names = {
                 'all': 'todos os parques',
-                '1': 'Parque 1',
-                '2': 'Parque 2',
-                '3': 'Parque 3'
+                'north': 'Parque Norte',
+                'south': 'Parque Sul'
             };
             parkingName.textContent = names[type];
-
+            
             // Atualizar display com o valor filtrado
             updateDisplay(parkingData[type], true);
         }
 
         // Atualizar ao carregar a página
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             fetchAvailableSpots();
-
+            
             // Atualizar automaticamente a cada 30 segundos
             setInterval(fetchAvailableSpots, 30000);
         });
     </script>
 </body>
-
-</html
+</html>

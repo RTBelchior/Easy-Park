@@ -18,15 +18,6 @@
             color: #003366;
         }
 
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 25px 60px;
-            color: white;
-            animation: slideDown 0.8s ease;
-        }
-
         .logo {
             font-size: 28px;
             font-weight: bold;
@@ -215,15 +206,7 @@
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">EasyPark</div>
-        <nav>
-            <a href="../index.html">Início</a>
-            <a href="formulario.html">Sugestões</a>
-            <a href="mapa.html">Parques</a>
-            <a href="login.html">Login</a>
-        </nav>
-    </header>
+    <?php include('header.php'); ?>
 
     <section class="form-section">
         <div class="form-container">
@@ -253,5 +236,6 @@
             </form>
         </div>
     </section>
+    <?php include('footer.php'); ?>
 </body>
 </html>
