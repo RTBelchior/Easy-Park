@@ -1,9 +1,9 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+error_reporting(0);
 
 $host = "localhost";
 $utilizador = "root";
@@ -17,7 +17,8 @@ try {
         throw new Exception("Falha na conexão: " . $conn->connect_error);
     }
     
-    // Query para contar entradas de hoje
+    $conn->set_charset("utf8");
+    
     $sql = "
         SELECT COUNT(*) as total_entradas
         FROM historico_acesso
@@ -29,20 +30,25 @@ try {
     
     if ($result) {
         $row = $result->fetch_assoc();
+        $total_entradas = (int)$row['total_entradas'];
+        
+        if (ob_get_length()) ob_clean();
         
         http_response_code(200);
         echo json_encode([
             'success' => true,
-            'total_entradas' => (int)$row['total_entradas'],
+            'total_entradas' => $total_entradas,
             'data' => date('Y-m-d')
         ], JSON_UNESCAPED_UNICODE);
     } else {
-        throw new Exception("Erro na query");
+        throw new Exception("Erro na query: " . $conn->error);
     }
     
     $conn->close();
     
 } catch (Exception $e) {
+    if (ob_get_length()) ob_clean();
+    
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -50,4 +56,6 @@ try {
         'error_details' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
+
+exit;
 ?>

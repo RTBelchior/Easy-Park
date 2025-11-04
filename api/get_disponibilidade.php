@@ -1,10 +1,9 @@
 <?php
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-// Mostrar erros (remover em produção)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+ini_set('display_errors', 0);
+error_reporting(0);
 
 $host = "localhost";
 $utilizador = "root";
@@ -18,7 +17,8 @@ try {
         throw new Exception("Falha na conexão: " . $conn->connect_error);
     }
     
-    // Query para buscar dados de todos os parques
+    $conn->set_charset("utf8");
+    
     $sql = "
         SELECT 
             id_parque,
@@ -37,7 +37,6 @@ try {
         $total_max = 0;
         $total_atual = 0;
         
-        // Processar cada parque
         while ($row = $result->fetch_assoc()) {
             $id = (int)$row['id_parque'];
             $max = (int)$row['lotacao_maxima'];
@@ -55,7 +54,8 @@ try {
             $total_atual += $atual;
         }
         
-        // Sucesso - retornar os dados de todos os parques
+        if (ob_get_length()) ob_clean();
+        
         http_response_code(200);
         echo json_encode([
             'success' => true,
@@ -67,11 +67,10 @@ try {
             ]
         ], JSON_UNESCAPED_UNICODE);
     } else {
-        // Nenhum registro encontrado
         http_response_code(404);
         echo json_encode([
             'success' => false,
-            'error' => 'Nenhum parque encontrado na base de dados',
+            'error' => 'Nenhum parque encontrado',
             'parques' => [],
             'total' => [
                 'lotacao_maxima' => 0,
@@ -84,7 +83,8 @@ try {
     $conn->close();
     
 } catch (Exception $e) {
-    // Erro na conexão ou query
+    if (ob_get_length()) ob_clean();
+    
     http_response_code(500);
     echo json_encode([
         'success' => false,
@@ -92,4 +92,6 @@ try {
         'error_details' => $e->getMessage()
     ], JSON_UNESCAPED_UNICODE);
 }
+
+exit;
 ?>

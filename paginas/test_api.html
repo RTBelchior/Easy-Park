@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de APIs - EasyPark</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f6fa;
+        }
+        
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #3b82f6;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        
+        button:hover {
+            background: #1e3a8a;
+        }
+        
+        .result {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .success {
+            color: #16a34a;
+            font-weight: bold;
+        }
+        
+        .error {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        .info {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        
+        .status.success {
+            background: rgba(34, 197, 94, 0.15);
+            color: #16a34a;
+        }
+        
+        .status.error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Teste de APIs - EasyPark</h1>
+    
+    <div class="info">
+        <strong>ℹ️ Instruções:</strong> Clique nos botões abaixo para testar cada API. Os resultados aparecerão logo abaixo de cada botão.
+    </div>
+
+    <!-- Teste 1: Disponibilidade -->
+    <div class="test-section">
+        <h2>1️⃣ API de Disponibilidade</h2>
+        <button onclick="testarDisponibilidade()">🧪 Testar API</button>
+        <button onclick="abrirNoNavegador('../api/get_disponibilidade.php')">🌐 Abrir no Navegador</button>
+        <span id="status-disp" class="status" style="display:none"></span>
+        <div id="result-disp" class="result" style="display:none"></div>
+    </div>
+
+    <!-- Teste 2: Entradas do Dia -->
+    <div class="test-section">
+        <h2>2️⃣ API de Entradas do Dia</h2>
+        <button onclick="testarEntradas()">🧪 Testar API</button>
+        <button onclick="abrirNoNavegador('../api/get_entradas_dia.php')">🌐 Abrir no Navegador</button>
+        <span id="status-ent" class="status" style="display:none"></span>
+        <div id="result-ent" class="result" style="display:none"></div>
+    </div>
+
+    <!-- Teste 3: Gráfico -->
+    <div class="test-section">
+        <h2>3️⃣ API de Dados do Gráfico</h2>
+        <button onclick="testarGrafico()">🧪 Testar API</button>
+        <button onclick="abrirNoNavegador('../api/get_grafico_dados.php?mes=11&ano=2025')">🌐 Abrir no Navegador</button>
+        <span id="status-graf" class="status" style="display:none"></span>
+        <div id="result-graf" class="result" style="display:none"></div>
+    </div>
+
+    <!-- Teste 4: Info do Utilizador -->
+    <div class="test-section">
+        <h2>4️⃣ API de Informações do Utilizador</h2>
+        <button onclick="testarUser()">🧪 Testar API</button>
+        <button onclick="abrirNoNavegador('../api/get_user_info.php')">🌐 Abrir no Navegador</button>
+        <span id="status-user" class="status" style="display:none"></span>
+        <div id="result-user" class="result" style="display:none"></div>
+    </div>
+
+    <!-- Verificação da Base de Dados -->
+    <div class="test-section">
+        <h2>5️⃣ Verificar Base de Dados</h2>
+        <div class="info">
+            Execute este SQL no phpMyAdmin para verificar se há dados:
+            <pre style="background:#1e293b; color:#fff; padding:10px; border-radius:6px; margin-top:10px; overflow-x:auto">
+SELECT 'PARQUES' AS Tabela, COUNT(*) AS Total FROM parque
+UNION ALL
+SELECT 'UTILIZADORES', COUNT(*) FROM utilizadores
+UNION ALL
+SELECT 'HISTÓRICO', COUNT(*) FROM historico_acesso
+UNION ALL
+SELECT 'ENTRADAS HOJE', COUNT(*) FROM historico_acesso 
+WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
+        </div>
+    </div>
+
+    <script>
+        function abrirNoNavegador(url) {
+            window.open(url, '_blank');
+        }
+
+        async function testarDisponibilidade() {
+            const resultDiv = document.getElementById('result-disp');
+            const statusSpan = document.getElementById('status-disp');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Carregando...';
+            statusSpan.style.display = 'none';
+            
+            try {
+                const response = await fetch('../api/get_disponibilidade.php');
+                const text = await response.text();
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Resposta não é um JSON válido:\n' + text);
+                }
+                
+                if (data.success) {
+                    statusSpan.textContent = '✓ Sucesso';
+                    statusSpan.className = 'status success';
+                    statusSpan.style.display = 'inline-block';
+                    
+                    resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
+                        `📊 TOTAL:\n` +
+                        `   Lotação Máxima: ${data.total.lotacao_maxima}\n` +
+                        `   Lotação Atual: ${data.total.lotacao_atual}\n` +
+                        `   Disponível: ${data.total.disponivel}\n\n` +
+                        `📍 PARQUES:\n` +
+                        Object.values(data.parques).map(p => 
+                            `   Parque ${p.id_parque}: ${p.lotacao_atual}/${p.lotacao_maxima} (${p.disponivel} livres)`
+                        ).join('\n') +
+                        `\n\n📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                statusSpan.textContent = '✗ Erro';
+                statusSpan.className = 'status error';
+                statusSpan.style.display = 'inline-block';
+                resultDiv.innerHTML = `❌ ERRO:\n${error.message}`;
+            }
+        }
+
+        async function testarEntradas() {
+            const resultDiv = document.getElementById('result-ent');
+            const statusSpan = document.getElementById('status-ent');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Carregando...';
+            statusSpan.style.display = 'none';
+            
+            try {
+                const response = await fetch('api/get_entradas_dia.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusSpan.textContent = '✓ Sucesso';
+                    statusSpan.className = 'status success';
+                    statusSpan.style.display = 'inline-block';
+                    
+                    resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
+                        `🚗 Total de Entradas Hoje: ${data.total_entradas}\n` +
+                        `📅 Data: ${data.data}\n\n` +
+                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                statusSpan.textContent = '✗ Erro';
+                statusSpan.className = 'status error';
+                statusSpan.style.display = 'inline-block';
+                resultDiv.innerHTML = `❌ ERRO:\n${error.message}`;
+            }
+        }
+
+        async function testarGrafico() {
+            const resultDiv = document.getElementById('result-graf');
+            const statusSpan = document.getElementById('status-graf');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Carregando...';
+            statusSpan.style.display = 'none';
+            
+            try {
+                const response = await fetch('../api/get_grafico_dados.php?mes=11&ano=2025');
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusSpan.textContent = '✓ Sucesso';
+                    statusSpan.className = 'status success';
+                    statusSpan.style.display = 'inline-block';
+                    
+                    const totalEntradas = data.entradas.reduce((a, b) => a + b, 0);
+                    const totalSaidas = data.saidas.reduce((a, b) => a + b, 0);
+                    
+                    resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
+                        `📅 Período: ${data.mes}/${data.ano}\n` +
+                        `📊 Total de Entradas: ${totalEntradas}\n` +
+                        `📊 Total de Saídas: ${totalSaidas}\n` +
+                        `📈 Dias com dados: ${data.dias.length}\n\n` +
+                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                statusSpan.textContent = '✗ Erro';
+                statusSpan.className = 'status error';
+                statusSpan.style.display = 'inline-block';
+                resultDiv.innerHTML = `❌ ERRO:\n${error.message}`;
+            }
+        }
+
+        async function testarUser() {
+            const resultDiv = document.getElementById('result-user');
+            const statusSpan = document.getElementById('status-user');
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '⏳ Carregando...';
+            statusSpan.style.display = 'none';
+            
+            try {
+                const response = await fetch('../api/get_user_info.php');
+                const data = await response.json();
+                
+                if (data.success) {
+                    statusSpan.textContent = '✓ Sucesso';
+                    statusSpan.className = 'status success';
+                    statusSpan.style.display = 'inline-block';
+                    
+                    resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
+                        `👤 Nome: ${data.user.nome}\n` +
+                        `🎫 Tipo: ${data.user.tipo_formatado}\n` +
+                        `📧 Email: ${data.user.email}\n` +
+                        `🔤 Iniciais: ${data.user.iniciais}\n\n` +
+                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                } else {
+                    throw new Error(data.error || 'Erro desconhecido');
+                }
+            } catch (error) {
+                statusSpan.textContent = '✗ Erro';
+                statusSpan.className = 'status error';
+                statusSpan.style.display = 'inline-block';
+                
+                if (error.message.includes('401') || error.message.includes('autenticado')) {
+                    resultDiv.innerHTML = `⚠️ UTILIZADOR NÃO AUTENTICADO\n\n` +
+                        `Para testar esta API:\n` +
+                        `1. Acesse: test_session.php\n` +
+                        `2. Depois volte aqui e teste novamente\n\n` +
+                        `Erro: ${error.message}`;
+                } else {
+                    resultDiv.innerHTML = `❌ ERRO:\n${error.message}`;
+                }
+            }
+        }
+
+        // Auto-testar ao carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Página de testes carregada!');
+        });
+    </script>
+</body>
+</html>

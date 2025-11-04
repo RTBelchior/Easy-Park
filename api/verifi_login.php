@@ -23,13 +23,13 @@ $password_input = trim($_POST['password'] ?? '');
 
 // Validação básica
 if (empty($email) || empty($password_input)) {
-    echo "<script>alert('Por favor, preencha todos os campos.');window.location.href='../paginas/login.html';</script>";
+    echo "<script>alert('Por favor, preencha todos os campos.');window.location.href='../paginas/login.php';</script>";
     exit();
 }
 
 // Verifica se o email é institucional, mas permite admin
 if (!preg_match("/^[0-9]+@estudantes\.ips\.pt$/", $email) && $email !== "admin@estudantes.ips.pt") {
-    echo "<script>alert('Use apenas o email institucional (ex: numero@estudantes.ips.pt)');window.location.href='../paginas/login.html';</script>";
+    echo "<script>alert('Use apenas o email institucional (ex: numero@estudantes.ips.pt)');window.location.href='../paginas/login.php';</script>";
     exit();
 }
 
@@ -42,7 +42,7 @@ $result = $stmt->get_result();
 
 // Verifica se o utilizador existe
 if ($result->num_rows === 0) {
-    echo "<script>alert('O seu email não está registado. Contacte a administração.');window.location.href='../paginas/login.html';</script>";
+    echo "<script>alert('O seu email não está registado. Contacte a administração.');window.location.href='../paginas/login.php';</script>";
     $stmt->close();
     $conn->close();
     exit();
@@ -52,7 +52,7 @@ $user = $result->fetch_assoc();
 
 // Verifica se a conta está ativa (boolean)
 if (!$user['ativo']) {
-    echo "<script>alert('Utilizador desativado. Contacte a administração.');window.location.href='../paginas/login.html';</script>";
+    echo "<script>alert('Utilizador desativado. Contacte a administração.');window.location.href='../paginas/login.php';</script>";
     $stmt->close();
     $conn->close();
     exit();
@@ -60,7 +60,7 @@ if (!$user['ativo']) {
 
 // Verifica a password (texto simples)
 if ($password_input !== $user['password']) {
-    echo "<script>alert('Palavra-passe incorreta!');window.location.href='../paginas/login.html';</script>";
+    echo "<script>alert('Palavra-passe incorreta!');window.location.href='../paginas/login.php';</script>";
     $stmt->close();
     $conn->close();
     exit();
@@ -79,7 +79,7 @@ $conn->close();
 // Redireciona conforme o tipo de utilizador
 // Verifica o valor do enum 'tipo'
 if (strtolower(trim($user['tipo'])) === 'administrador') {
-    header("Location: ../paginas/administracao.html");
+    header("Location: ../paginas/administracao.php");
     exit();
 } else {
     header("Location: ../index.html");

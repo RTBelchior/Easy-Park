@@ -4,363 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPark - Painel Administrativo</title>
+    <link rel="stylesheet" href="../css/administracao.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            background: #f5f6fa;
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 240px;
-            background: white;
-            padding: 30px 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1e3a8a;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        /* Fix para emojis que podem não carregar corretamente */
         .logo::before {
             content: "🚧";
-            font-size: 28px;
-        }
-
-        .menu-section {
-            margin-bottom: 30px;
-        }
-
-        .menu-label {
-            font-size: 11px;
-            font-weight: 600;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 10px;
-        }
-
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            color: #64748b;
-            text-decoration: none;
-            font-weight: 500;
-            transition: all 0.2s;
-            margin-bottom: 4px;
-        }
-
-        .menu-item:hover {
-            background: #f1f5f9;
-            color: #1e3a8a;
-        }
-
-        .menu-item.active {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .menu-item-icon {
-            font-size: 20px;
-        }
-
-        /* ===== MAIN CONTENT ===== */
-        .main-content {
-            flex: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .header-title h1 {
-            font-size: 32px;
-            color: #1e293b;
-            margin-bottom: 5px;
-        }
-
-        .header-subtitle {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            background: white;
-            padding: 10px 16px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: 600;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .user-name {
-            font-weight: 600;
-            color: #1e293b;
-            font-size: 14px;
-        }
-
-        .user-role {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* ===== STATS GRID ===== */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-card {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .stat-card.primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #1e3a8a 100%);
-            color: white;
-        }
-
-        .stat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            background: rgba(59, 130, 246, 0.1);
-        }
-
-        .stat-card.primary .stat-icon {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .stat-badge {
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-success {
-            background: rgba(34, 197, 94, 0.15);
-            color: #16a34a;
-        }
-
-        .badge-warning {
-            background: rgba(234, 179, 8, 0.15);
-            color: #ca8a04;
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: #dc2626;
-        }
-
-        .stat-card.primary .stat-badge {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .stat-title {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 8px;
-        }
-
-        .stat-card.primary .stat-title {
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-
-        .stat-card.primary .stat-value {
-            color: white;
-        }
-
-        .stat-subtitle {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        .stat-card.primary .stat-subtitle {
-            color: rgba(255, 255, 255, 0.8);
-        }
-
-        /* ===== CHART SECTION ===== */
-        .chart-section {
-            background: white;
-            padding: 28px;
-            border-radius: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .chart-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1e293b;
-        }
-
-        .chart-subtitle {
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .chart-controls {
-            display: flex;
-            gap: 10px;
-        }
-
-        .select-dropdown {
-            padding: 8px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            color: #64748b;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .select-dropdown:hover {
-            border-color: #3b82f6;
-        }
-
-        .chart-container {
-            height: 320px;
-            position: relative;
-        }
-
-        .chart-placeholder {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #94a3b8;
-            font-style: italic;
-        }
-
-        .loading {
-            text-align: center;
-            color: #64748b;
-            font-style: italic;
-            padding: 20px;
-        }
-
-        /* ===== LEGEND ===== */
-        .chart-legend {
-            display: flex;
-            gap: 24px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #64748b;
-        }
-
-        .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
-        }
-
-        .legend-entradas {
-            background: #3b82f6;
-        }
-
-        .legend-saidas {
-            background: #94a3b8;
-        }
-
-        @media (max-width: 768px) {
-            body {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                padding: 20px;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
@@ -400,13 +48,13 @@
         <div class="header">
             <div class="header-title">
                 <h1>Painel Administrativo</h1>
-                <p class="header-subtitle">Sexta-feira, 15 de dezembro de 2023</p>
+                <p class="header-subtitle">Carregando...</p>
             </div>
             <div class="user-info">
-                <div class="user-avatar">FA</div>
+                <div class="user-avatar">A</div>
                 <div class="user-details">
-                    <div class="user-name">Ferra Alexandra</div>
-                    <div class="user-role">Administradora</div>
+                    <div class="user-name">Carregando...</div>
+                    <div class="user-role">Administrador</div>
                 </div>
             </div>
         </div>
@@ -463,11 +111,22 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">🚗</div>
-                        <span class="stat-badge badge-success" id="badge-entradas">+12.1%</span>
+                        <span class="stat-badge badge-success" id="badge-entradas">+0%</span>
                     </div>
                     <div class="stat-title">Entradas Hoje</div>
                     <div class="stat-value" id="entradas-hoje">--</div>
                     <div class="stat-subtitle">Veículos vs ontem</div>
+                </div>
+
+                <!--Visitas do Site -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🧑‍🤝‍🧑</div>
+                        <span class="stat-badge badge-success">+0%</span>
+                    </div>
+                    <div class="stat-title">Visitas Hoje</div>
+                    <div class="stat-value" id="visitas-hoje">--</div>
+                    <div class="stat-subtitle">Visualizações</div>
                 </div>
             </div>
         </div>
@@ -492,12 +151,12 @@
                             <option value="8">Agosto</option>
                             <option value="9">Setembro</option>
                             <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12" selected>Dezembro</option>
+                            <option value="11" selected>Novembro</option>
+                            <option value="12">Dezembro</option>
                         </select>
                         <select class="select-dropdown" id="yearSelect" onchange="updateChart()">
-                            <option value="2023" selected>2023</option>
-                            <option value="2024">2024</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2026">2026</option>
                         </select>
                     </div>
                 </div>
@@ -538,57 +197,148 @@
             }
         }
 
-        // Buscar dados de lotação
-        async function fetchLotacaoData() {
+        // Buscar dados do utilizador
+        async function fetchUserInfo() {
             try {
-                const response = await fetch('api/get_disponibilidade.php');
+                const response = await fetch('../api/get_user_info.php');
                 const data = await response.json();
                 
                 if (data.success) {
+                    const user = data.user;
+                    
+                    // Atualizar avatar com iniciais
+                    const avatar = document.querySelector('.user-avatar');
+                    if (avatar) {
+                        avatar.textContent = user.iniciais;
+                    }
+                    
+                    // Atualizar nome
+                    const userName = document.querySelector('.user-name');
+                    if (userName) {
+                        userName.textContent = user.nome;
+                    }
+                    
+                    // Atualizar role/tipo
+                    const userRole = document.querySelector('.user-role');
+                    if (userRole) {
+                        userRole.textContent = user.tipo_formatado;
+                    }
+                    
+                    console.log('✅ Dados do utilizador carregados:', user);
+                } else {
+                    console.log('⚠️ Utilizador não autenticado');
+                }
+            } catch (error) {
+                console.log('⚠️ Erro ao buscar dados do utilizador:', error.message);
+            }
+        }
+
+        // Buscar dados de lotação
+        async function fetchLotacaoData() {
+            try {
+                console.log('🔄 Buscando dados de lotação...');
+                const response = await fetch('../api/get_disponibilidade.php');
+                
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP: ${response.status}`);
+                }
+                
+                const responseText = await response.text();
+                console.log('📥 Resposta bruta:', responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('❌ Erro ao fazer parse do JSON:', e);
+                    throw new Error('Resposta inválida do servidor');
+                }
+                
+                console.log('📊 Dados parseados:', data);
+                
+                if (data.success) {
                     // Atualizar lotação total
-                    document.getElementById('lotacao-total').textContent = data.total.lotacao_atual;
+                    const lotacaoTotalEl = document.getElementById('lotacao-total');
+                    if (lotacaoTotalEl) {
+                        lotacaoTotalEl.textContent = data.total.lotacao_atual;
+                        console.log('✅ Lotação total atualizada:', data.total.lotacao_atual);
+                    } else {
+                        console.error('❌ Elemento lotacao-total não encontrado');
+                    }
                     
                     // Atualizar cada parque
                     for (let i = 1; i <= 3; i++) {
+                        console.log(`🔍 Verificando parque ${i}...`);
+                        
                         if (data.parques[i]) {
                             const parque = data.parques[i];
-                            document.getElementById(`lotacao-${i}`).textContent = parque.lotacao_atual;
-                            document.getElementById(`subtitle-${i}`).textContent = `de ${parque.lotacao_maxima} lugares`;
+                            console.log(`📍 Dados do Parque ${i}:`, parque);
+                            
+                            // Atualizar número
+                            const lotacaoEl = document.getElementById(`lotacao-${i}`);
+                            if (lotacaoEl) {
+                                lotacaoEl.textContent = parque.lotacao_atual;
+                                console.log(`✅ Lotação do parque ${i} atualizada:`, parque.lotacao_atual);
+                            } else {
+                                console.error(`❌ Elemento lotacao-${i} não encontrado`);
+                            }
+                            
+                            // Atualizar subtitle
+                            const subtitleEl = document.getElementById(`subtitle-${i}`);
+                            if (subtitleEl) {
+                                subtitleEl.textContent = `de ${parque.lotacao_maxima} lugares`;
+                                console.log(`✅ Subtitle do parque ${i} atualizado`);
+                            }
                             
                             // Atualizar badge
                             const badge = document.getElementById(`badge-${i}`);
-                            const percentagem = (parque.lotacao_atual / parque.lotacao_maxima) * 100;
-                            
-                            if (percentagem >= 90) {
-                                badge.textContent = 'Lotado';
-                                badge.className = 'stat-badge badge-danger';
-                            } else if (percentagem >= 70) {
-                                badge.textContent = 'Quase Cheio';
-                                badge.className = 'stat-badge badge-warning';
-                            } else {
-                                badge.textContent = 'Disponível';
-                                badge.className = 'stat-badge badge-success';
+                            if (badge) {
+                                const percentagem = (parque.lotacao_atual / parque.lotacao_maxima) * 100;
+                                
+                                if (percentagem >= 90) {
+                                    badge.textContent = 'Lotado';
+                                    badge.className = 'stat-badge badge-danger';
+                                } else if (percentagem >= 70) {
+                                    badge.textContent = 'Quase Cheio';
+                                    badge.className = 'stat-badge badge-warning';
+                                } else {
+                                    badge.textContent = 'Disponível';
+                                    badge.className = 'stat-badge badge-success';
+                                }
+                                console.log(`✅ Badge do parque ${i} atualizado: ${percentagem.toFixed(1)}%`);
                             }
+                        } else {
+                            console.warn(`⚠️ Parque ${i} não encontrado nos dados`);
                         }
                     }
+                    
+                    console.log('✅ Todos os dados de lotação atualizados com sucesso!');
+                } else {
+                    console.error('❌ API retornou erro:', data.error);
                 }
             } catch (error) {
-                console.error('Erro ao buscar lotação:', error);
+                console.error('❌ Erro ao buscar lotação:', error.message);
             }
         }
 
         // Buscar entradas de hoje
         async function fetchEntradasHoje() {
             try {
-                const response = await fetch('api/get_entradas_dia.php');
+                console.log('🔄 Buscando entradas de hoje...');
+                const response = await fetch('../api/get_entradas_dia.php');
                 const data = await response.json();
                 
                 if (data.success) {
-                    document.getElementById('entradas-hoje').textContent = data.total_entradas;
+                    const entradasEl = document.getElementById('entradas-hoje');
+                    if (entradasEl) {
+                        entradasEl.textContent = data.total_entradas;
+                        console.log('✅ Entradas de hoje atualizadas:', data.total_entradas);
+                    }
                 }
             } catch (error) {
-                console.error('Erro ao buscar entradas:', error);
-                document.getElementById('entradas-hoje').textContent = '0';
+                console.error('❌ Erro ao buscar entradas:', error.message);
+                const entradasEl = document.getElementById('entradas-hoje');
+                if (entradasEl) entradasEl.textContent = '0';
             }
         }
 
@@ -648,7 +398,7 @@
             const year = document.getElementById('yearSelect').value;
 
             try {
-                const response = await fetch(`api/get_grafico_dados.php?mes=${month}&ano=${year}`);
+                const response = await fetch(`../api/get_grafico_dados.php?mes=${month}&ano=${year}`);
                 const data = await response.json();
                 
                 if (data.success) {
@@ -656,9 +406,10 @@
                     trafficChart.data.datasets[0].data = data.entradas;
                     trafficChart.data.datasets[1].data = data.saidas;
                     trafficChart.update();
+                    console.log('✅ Gráfico atualizado');
                 }
             } catch (error) {
-                console.error('Erro ao buscar dados do gráfico:', error);
+                console.error('❌ Erro ao buscar dados do gráfico:', error);
             }
         }
 
@@ -670,17 +421,24 @@
             const now = new Date();
             const dateStr = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
             
-            document.querySelector('.header-subtitle').textContent = dateStr;
+            const subtitle = document.querySelector('.header-subtitle');
+            if (subtitle) {
+                subtitle.textContent = dateStr;
+            }
         }
 
         // Inicializar ao carregar a página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página carregada! Inicializando...');
+            
             updateDate();
+            fetchUserInfo();
             fetchLotacaoData();
             fetchEntradasHoje();
             
             // Atualizar a cada 30 segundos
             setInterval(() => {
+                console.log('🔄 Atualizando dados automaticamente...');
                 fetchLotacaoData();
                 fetchEntradasHoje();
             }, 30000);
