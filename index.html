@@ -1,10 +1,6 @@
-<?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-?>
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,6 +23,14 @@ if (session_status() === PHP_SESSION_NONE) {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            animation: slideDown 0.8s ease;
         }
 
         .logo {
@@ -186,7 +190,7 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         /* Filtros de Parques */
-       .parking-filters {
+        .parking-filters {
             display: flex;
             flex-direction: column;
             gap: 25px;
@@ -306,6 +310,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 opacity: 0;
                 transform: translateY(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -317,6 +322,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 opacity: 0;
                 transform: translateX(-50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -328,6 +334,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 opacity: 0;
                 transform: translateX(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateX(0);
@@ -338,15 +345,19 @@ if (session_status() === PHP_SESSION_NONE) {
             from {
                 opacity: 0;
             }
+
             to {
                 opacity: 1;
             }
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.05);
             }
@@ -362,7 +373,8 @@ if (session_status() === PHP_SESSION_NONE) {
                 font-size: 36px;
             }
 
-            .features, .parking-filters {
+            .features,
+            .parking-filters {
                 grid-template-columns: 1fr;
             }
 
@@ -372,9 +384,18 @@ if (session_status() === PHP_SESSION_NONE) {
         }
     </style>
 </head>
+
 <body>
-    <?php include('paginas/header.php'); ?>
     <div class="container">
+        <header>
+            <div class="logo">EasyPark</div>
+            <nav>
+                <a href="index.html">Início</a>
+                <a href="paginas/formulario.html">Sugestões</a>
+                <a href="paginas/mapa.html">Parques</a>
+                <a href="paginas/login.html">Login</a>
+            </nav>
+        </header>
 
         <section class="hero">
             <div class="hero-content">
@@ -427,6 +448,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -451,129 +473,121 @@ if (session_status() === PHP_SESSION_NONE) {
         </section>
     </div>
 
-    <?php include('paginas/footer.php'); ?>
-
     <script>
         let parkingData = {
             all: 0,
-            1: 0,
-            2: 0,
-            3: 0
+            '1': 0,
+            '2': 0,
+            '3': 0
         };
 
         let currentFilter = 'all';
 
         async function fetchAvailableSpots() {
             const statusMsg = document.getElementById('statusMessage');
-            
+
             try {
                 if (statusMsg) {
                     statusMsg.innerHTML = '<span class="loading">A carregar dados...</span>';
                 }
-                
+
                 // Buscar dados de todos os parques
                 const response = await fetch('api/get_disponibilidade.php');
-                
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP: ${response.status}`);
-                }
-                
                 const responseText = await response.text();
                 console.log('Resposta do servidor:', responseText);
-                
+
                 let data;
                 try {
                     data = JSON.parse(responseText);
                 } catch (e) {
-                    console.error('Erro ao fazer parse do JSON:', e);
-                    console.error('Resposta recebida:', responseText);
-                    throw new Error('Resposta inválida do servidor. Verifique o console.');
+                    throw new Error('Resposta inválida do servidor. Verifique o console do navegador.');
                 }
-                
-                if (data.success) {
-                    // Atualizar dados de cada parque
+
+                if (data.success && data.parques) {
+                    // Atualizar dados do total
                     parkingData.all = data.total.disponivel;
-                    parkingData[1] = data.parques[1] ? data.parques[1].disponivel : 0;
-                    parkingData[2] = data.parques[2] ? data.parques[2].disponivel : 0;
-                    parkingData[3] = data.parques[3] ? data.parques[3].disponivel : 0;
-                    
+
+                    // Atualizar dados de cada parque individual
+                    parkingData['1'] = data.parques[1] ? data.parques[1].disponivel : 0;
+                    parkingData['2'] = data.parques[2] ? data.parques[2].disponivel : 0;
+                    parkingData['3'] = data.parques[3] ? data.parques[3].disponivel : 0;
+
                     updateAllDisplays();
-                    console.log('Dados carregados com sucesso:', parkingData);
-                    
-                    if (statusMsg) {
-                        statusMsg.innerHTML = '<span class="success">✓ Dados atualizados</span>';
-                    }
+                    console.log('Dados carregados com sucesso:', data);
+                    console.log('Parques processados:', parkingData);
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(data.error || 'Erro desconhecido ao carregar parques');
                 }
-                
+
             } catch (error) {
                 console.error('Erro completo:', error);
-                if (statusMsg) {
-                    statusMsg.innerHTML = `<span class="error">✗ ${error.message}</span>`;
-                }
-                // Manter os valores atuais em caso de erro
+                updateDisplay(0, false, error.message);
             }
         }
 
         function updateAllDisplays() {
             // Atualizar contadores dos filtros
             document.getElementById('count-all').textContent = parkingData.all;
-            document.getElementById('count-1').textContent = parkingData[1];
-            document.getElementById('count-2').textContent = parkingData[2];
-            document.getElementById('count-3').textContent = parkingData[3];
-            
+            document.getElementById('count-1').textContent = parkingData['1'];
+            document.getElementById('count-2').textContent = parkingData['2'];
+            document.getElementById('count-3').textContent = parkingData['3'];
+
             // Atualizar display principal
-            updateMainDisplay();
+            updateDisplay(parkingData[currentFilter], true);
         }
 
-        function updateMainDisplay() {
+        function updateDisplay(available, success, errorMessage = '') {
             const display = document.getElementById('availableSpots');
+            const statusMsg = document.getElementById('statusMessage');
+
+            display.style.animation = 'none';
+            setTimeout(() => {
+                display.textContent = available;
+                display.style.animation = 'pulse 2s ease-in-out infinite';
+            }, 10);
+
+            if (statusMsg) {
+                if (success) {
+                    statusMsg.innerHTML = '<span class="success">✓ Dados atualizados</span>';
+                } else {
+                    statusMsg.innerHTML = `<span class="error">✗ ${errorMessage || 'Erro ao carregar dados'}</span>`;
+                }
+            }
+        }
+
+        function filterParking(type) {
+            currentFilter = type;
+
+            // Remover classe active de todos
+            document.querySelectorAll('.filter-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Adicionar classe active ao clicado
+            event.currentTarget.classList.add('active');
+
+            // Atualizar nome do parque
             const parkingName = document.getElementById('parkingName');
-            
             const names = {
                 'all': 'todos os parques',
                 '1': 'Parque 1',
                 '2': 'Parque 2',
                 '3': 'Parque 3'
             };
-            
-            // Atualizar número com animação
-            display.style.animation = 'none';
-            setTimeout(() => {
-                display.textContent = parkingData[currentFilter];
-                display.style.animation = 'pulse 2s ease-in-out infinite';
-            }, 10);
-            
-            // Atualizar nome
-            if (parkingName) {
-                parkingName.textContent = names[currentFilter] || 'todos os parques';
-            }
-        }
+            parkingName.textContent = names[type];
 
-        function filterParking(type) {
-            currentFilter = type;
-            
-            // Remover classe active de todos
-            document.querySelectorAll('.filter-card').forEach(card => {
-                card.classList.remove('active');
-            });
-            
-            // Adicionar classe active ao clicado
-            event.currentTarget.classList.add('active');
-            
-            // Atualizar display principal
-            updateMainDisplay();
+            // Atualizar display com o valor filtrado
+            updateDisplay(parkingData[type], true);
         }
 
         // Atualizar ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Página carregada, iniciando busca de dados...');
+        document.addEventListener('DOMContentLoaded', function () {
             fetchAvailableSpots();
-            
+
             // Atualizar automaticamente a cada 30 segundos
             setInterval(fetchAvailableSpots, 30000);
         });
     </script>
 </body>
-</html>
+
+</html

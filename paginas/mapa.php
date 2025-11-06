@@ -1,3 +1,9 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt">
 <head>
@@ -18,29 +24,6 @@
       display: flex;
       flex-direction: column;
       color: white;
-    }
-
-    /* ===== HEADER ===== */
-    header {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 25px 80px;
-    }
-
-    .logo {
-      font-size: 26px;
-      font-weight: 600;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .logo::before {
-      content: "🚧";
-      font-size: 30px;
     }
 
     nav {
@@ -229,15 +212,7 @@
 </head>
 <body>
 
-  <header>
-    <div class="logo">EasyPark</div>
-    <nav>
-      <a href="../index.php">Início</a>
-      <a href="formulario.php">Sugestões</a>
-      <a href="mapa.php">Parques</a>
-      <a href="login.php">Login</a>
-    </nav>
-  </header>
+  <?php include('header.php'); ?> 
 
   <main>
     <h1>Parques de estacionamento</h1>
@@ -292,6 +267,8 @@
       </div>
     </div>
   </main>
+
+  <?php include('footer.php'); ?>
 
   <script>
     async function fetchParkingAvailability() {

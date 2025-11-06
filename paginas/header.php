@@ -1,12 +1,17 @@
-<!-- header.php -->
 <header>
   <div class="header-container">
     <div class="header-logo">EasyPark</div>
     <nav class="header-nav">
-        <a href="/Easy-Park/index.php">Início</a>
-        <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
-        <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
+      <a href="/Easy-Park/index.php">Início</a>
+      <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
+      <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
+
+      <?php if (isset($_SESSION['logado']) && $_SESSION['logado'] === true): ?>
+        <span class="bem-vindo">Bem-vindo, <?= htmlspecialchars($_SESSION['nome']); ?>!</span>
+        <a href="/Easy-Park/api/logout.php" class="logout-link">Sair</a>
+      <?php else: ?>
         <a href="/Easy-Park/paginas/login.php">Login</a>
+      <?php endif; ?>
     </nav>
   </div>
 </header>
@@ -16,7 +21,17 @@
     background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
     padding: 20px 0;
     width: 100%;
-    animation: slideDown 0.8s ease;
+    position: fixed; /* mantém o header visível ao descer */
+    top: 0;
+    left: 0;
+    z-index: 999;
+    animation: headerSlideDown 0.8s ease;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  /* adiciona espaço pra o conteúdo não ficar escondido atrás do header */
+  body {
+    padding-top: 80px;
   }
 
   .header-container {
@@ -44,7 +59,8 @@
 
   .header-nav {
     display: flex;
-    gap: 40px;
+    align-items: center;
+    gap: 30px;
   }
 
   .header-nav a {
@@ -74,13 +90,22 @@
     width: 100%;
   }
 
-    @keyframes headerSlideDown {
+  .bem-vindo {
+    color: #fff;
+    font-weight: 500;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 6px 16px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+  }
+
+  .logout-link {
+    color: #ffcccc;
+    font-weight: bold;
+  }
+
+  @keyframes headerSlideDown {
     from { opacity: 0; transform: translateY(-50px); }
     to { opacity: 1; transform: translateY(0); }
-    }
-
-    header {
-    animation: headerSlideDown 0.8s ease;
-    }
-
+  }
 </style>
