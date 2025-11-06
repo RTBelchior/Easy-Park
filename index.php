@@ -446,7 +446,7 @@
         </section>
     </div>
 
-    <?php include('footer.php'); ?>
+    <?php include('paginas/footer.php'); ?>
 
     <script>
         let parkingData = {
