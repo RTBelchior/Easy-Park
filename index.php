@@ -43,7 +43,7 @@ if (session_status() === PHP_SESSION_NONE) {
             font-size: 32px;
         }
 
-        nav {
+        saiba {
             display: flex;
             gap: 30px;
         }
@@ -380,7 +380,9 @@ if (session_status() === PHP_SESSION_NONE) {
             <div class="hero-content">
                 <h1>Controlo Inteligente de Acessos</h1>
                 <p>Gere o estacionamento de forma automática e eficiente com tecnologia de ponta</p>
-                <button class="cta-button">Saber Mais</button>
+                <!--<button class="cta-button">Saber Mais</button>-->
+                <a href="paginas/saibamais.html" class="cta-button">Saber Mais</a>
+
             </div>
 
             <div class="availability-card">

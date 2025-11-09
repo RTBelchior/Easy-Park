@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EasyPark - Saiba Mais</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      min-height: 100vh;
+      color: #003366;
+      margin: 0;
+    }
+
+    header {
+      background-color: #2a3d99;
+      color: white;
+      padding: 15px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+
+    header h1 {
+      font-size: 1.4em;
+      font-weight: 600;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      background-color: #f4f6ff;
+      border-radius: 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      width: 60%;
+      margin: 80px auto;
+      padding: 40px;
+      text-align: center;
+
+      /* estado inicial da animação */
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    /* estado final (ativado via JS) */
+    .container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    h2 {
+      color: #1c2b8a;
+      font-size: 1.8em;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.1em;
+      color: #333;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+
+    footer {
+      text-align: center;
+      color: white;
+      font-size: 0.9em;
+      padding: 15px;
+      margin-top: 50px;
+    }
+     button.voltar {
+            background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="reset"],
+        button.voltar {
+            background: white;
+            color: #1e3a8a;
+            border: 2px solid #1e3a8a;
+        }
+        button.voltar:hover {
+            background: #e6f0ff;
+            transform: translateY(-3px);
+        }
+  </style>
+
+
+</head>
+<body>
+  <header>
+    <h1>EasyPark</h1>
+    <nav>
+      <a href="index.html">Início</a>
+      <a href="sugestoes.html">Sugestões</a>
+      <a href="mapa.html">Mapa</a>
+      <a href="login.html">Login</a>
+      <a href="saibamais.html"><strong>Saiba Mais</strong></a>
+    </nav>
+  </header>
+
+  <div class="container" id="content">
+    <h2>Sobre o EasyPark</h2>
+    <p>O <strong>EasyPark</strong> é um projeto desenvolvido para facilitar o acesso e a gestão de estacionamentos automáticos através de tecnologia moderna e intuitiva. O sistema foi pensado para oferecer mais conforto, segurança e eficiência tanto para os utilizadores como para os administradores.</p>
+
+    <p>Com o EasyPark, é possível controlar as cancelas, monitorizar o número de vagas em tempo real e recolher sugestões dos utilizadores para melhorias constantes. O nosso objetivo é tornar o estacionamento uma experiência simples e prática para todos.</p>
+
+    <p>Estamos sempre abertos a ouvir as suas ideias! Se tiver alguma sugestão, visite a nossa <a href="/Easy-Park/paginas/formulario.php" style="color:#3b50d3; text-decoration:none; font-weight:600;">página de sugestões</a>.</p>
+
+    <button type="button" class="voltar" onclick="history.back()">Voltar</button>
+  </div>
+
+  <footer>
+    © 2025 EasyPark. Todos os direitos reservados.
+  </footer>
+
+  <script>
+    // animação suave ao carregar
+    window.addEventListener("load", () => {
+      const content = document.getElementById("content");
+      setTimeout(() => {
+        content.classList.add("visible");
+      }, 200); // pequeno atraso para suavizar o efeito
+    });
+  </script>
+</body>
+</html>
