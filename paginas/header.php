@@ -7,7 +7,9 @@
       <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
 
       <?php if (isset($_SESSION['logado']) && $_SESSION['logado'] === true): ?>
-        <span class="bem-vindo">Bem-vindo, <?= htmlspecialchars($_SESSION['nome']); ?>!</span>
+        <a href="/Easy-Park/paginas/perfil.php" class="bem-vindo">
+          Perfil (<?= htmlspecialchars($_SESSION['nome']); ?>)
+        </a>
         <a href="/Easy-Park/api/logout.php" class="logout-link">Sair</a>
       <?php else: ?>
         <a href="/Easy-Park/paginas/login.php">Login</a>
