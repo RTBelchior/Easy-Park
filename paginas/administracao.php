@@ -38,10 +38,6 @@ if (session_status() === PHP_SESSION_NONE) {
         <div class="menu-section">
             <div class="menu-label">Ferramentas</div>
             <a href="#" class="menu-item">
-                <span class="menu-item-icon">⚙️</span>
-                <span>Configurações</span>
-            </a>
-            <a href="#" class="menu-item">
                 <span class="menu-item-icon">📝</span>
                 <span>Relatórios</span>
             </a>
