@@ -1,110 +1,160 @@
+<?php
+session_start();
+// Se já estiver logado, redireciona
+if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
+    header("Location: ../index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="pt">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>EasyPark - Login Escolar</title>
+  <title>EasyPark - Login</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      /* Gradiente de fundo consistente com o resto do site */
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: #03305a;
-      display: flex;
-      flex-direction: column; /* empilha header, conteúdo e footer */
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     main {
-      flex: 1; /* faz o conteúdo ocupar o espaço entre header e footer */
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
     }
 
     .auth-card {
       width: 100%;
-      max-width: 420px;
+      max-width: 400px;
+      /* Efeito de vidro (Glassmorphism) */
       background: rgba(255, 255, 255, 0.95);
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
-      padding: 32px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      padding: 40px 30px;
+      text-align: center;
+      position: relative;
+      border: 1px solid rgba(255,255,255,0.4);
     }
 
     h1 {
-      text-align: center;
       color: #1e3a8a;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      font-size: 26px;
     }
 
-    p {
-      text-align: center;
-      font-size: 0.95rem;
-      color: #ffffffff;
+    .subtitle {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 30px;
+    }
+
+    /* Caixa de Erro */
+    .error-message {
+      background-color: #fef2f2;
+      color: #dc2626;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid #fecaca;
+      font-size: 14px;
       margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: shake 0.5s ease-in-out;
+      text-align: left;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+      position: relative;
     }
 
     label {
       display: block;
-      font-weight: bold;
-      color: #16325a;
-      margin-bottom: 6px;
+      font-weight: 600;
+      color: #334155;
+      margin-bottom: 8px;
+      font-size: 14px;
     }
 
-    input[type="email"],
-    input[type="password"] {
+    /* Inputs com ícone */
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper input {
       width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid #99ccff;
-      font-size: 1rem;
-      margin-bottom: 14px;
+      padding: 14px 14px 14px 45px; /* Espaço para o ícone */
+      border-radius: 12px;
+      border: 2px solid #e2e8f0;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      background: #f8fafc;
     }
 
-    input:focus {
+    .input-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 18px;
+    }
+
+    .input-wrapper input:focus {
       border-color: #3b82f6;
-      box-shadow: 0 0 6px rgba(59, 130, 246, 0.3);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
       outline: none;
+    }
+
+    .input-wrapper input:focus + .input-icon {
+      color: #3b82f6;
     }
 
     .primary-btn {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       border: none;
-      border-radius: 30px;
-      background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+      border-radius: 12px;
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       color: white;
       font-weight: bold;
       cursor: pointer;
-      font-size: 1rem;
+      font-size: 16px;
       margin-top: 10px;
-      transition: background 0.3s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
     }
 
     .primary-btn:hover {
-      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
     }
 
-    .small {
-      font-size: 0.85rem;
-      color: #4b5563;
-      text-align: center;
-      margin-top: 12px;
+    .footer-note {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 25px;
+      line-height: 1.5;
     }
 
-    .small strong {
-      color: #1e3a8a;
+    /* Animação de erro */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
   </style>
 </head>
@@ -114,29 +164,54 @@
 
   <main>
     <div class="auth-card">
-      <h1>Login Escolar</h1>
+      <h1>Bem-vindo de volta</h1>
+      <p class="subtitle">Insira as suas credenciais escolares para continuar</p>
+
+      <!-- ÁREA DE ERROS DINÂMICA -->
+      <?php if (isset($_SESSION['login_erro'])): ?>
+        <div class="error-message">
+            <span>⚠️</span>
+            <span><?= htmlspecialchars($_SESSION['login_erro']) ?></span>
+        </div>
+        <?php unset($_SESSION['login_erro']); // Limpa o erro após mostrar ?>
+      <?php endif; ?>
+
       <form action="../api/verifi_login.php" method="post">
-        <label for="email">Email institucional</label>
-        <input 
-          type="email" 
-          id="email" 
-          name="email" 
-          placeholder="numeroIps@estudantes.ips.pt" 
-          required
-          pattern="([0-9]+@estudantes\.ips\.pt|admin@estudantes.ips.pt)"
-          title="Apenas emails do domínio estudantes.ips.pt são permitidos.">
         
-        <label for="password">Palavra-passe</label>
-        <input 
-          type="password" 
-          id="password" 
-          name="password" 
-          placeholder="••••••••" 
-          required>
+        <!-- Campo Email -->
+        <div class="form-group">
+            <label for="email">Email Institucional</label>
+            <div class="input-wrapper">
+                <input 
+                  type="email" 
+                  id="email" 
+                  name="email" 
+                  placeholder="numero@estudantes.ips.pt" 
+                  required
+                  autocomplete="email">
+                <span class="input-icon">📧</span>
+            </div>
+        </div>
+        
+        <!-- Campo Senha -->
+        <div class="form-group">
+            <label for="password">Palavra-passe</label>
+            <div class="input-wrapper">
+                <input 
+                  type="password" 
+                  id="password" 
+                  name="password" 
+                  placeholder="••••••••" 
+                  required>
+                <span class="input-icon">🔒</span>
+            </div>
+        </div>
 
-        <button type="submit" class="primary-btn">Entrar</button>
+        <button type="submit" class="primary-btn">Entrar na Plataforma</button>
 
-        <p class="small">Use apenas a sua conta escolar: <strong>número@estudantes.ips.pt</strong></p>
+        <p class="footer-note">
+            Acesso exclusivo para membros do<br><strong>Instituto Politécnico de Setúbal</strong>
+        </p>
       </form>
     </div>
   </main>

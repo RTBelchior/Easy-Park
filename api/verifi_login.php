@@ -1,64 +1,76 @@
 <?php
 session_start();
 
-// Mostrar erros (só pra debug)
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// Conexão ao banco
+// Configurações de conexão
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "easypark";
 
 $conn = new mysqli($servername, $username, $password, $dbname);
+
 if ($conn->connect_error) {
-    die("Erro na conexão: " . $conn->connect_error);
+    $_SESSION['login_erro'] = "Erro interno do servidor.";
+    header("Location: ../paginas/login.php");
+    exit();
 }
 
-// Dados do formulário
+$conn->set_charset("utf8");
+
+// Receber dados e limpar
 $email = trim($_POST['email'] ?? '');
 $password_input = trim($_POST['password'] ?? '');
 
-// Validação básica
+// 1. Validação de Campos Vazios
 if (empty($email) || empty($password_input)) {
-    echo "<script>alert('Por favor, preencha todos os campos.');window.location.href='../paginas/login.php';</script>";
+    $_SESSION['login_erro'] = "Por favor, preencha todos os campos.";
+    header("Location: ../paginas/login.php");
     exit();
 }
 
-// Verifica se o email é institucional ou admin
+// 2. Validação de Formato de Email
 if (!preg_match("/^[0-9]+@estudantes\.ips\.pt$/", $email) && $email !== "admin@estudantes.ips.pt") {
-    echo "<script>alert('Use apenas o email institucional (ex: numero@estudantes.ips.pt)');window.location.href='../paginas/login.php';</script>";
+    $_SESSION['login_erro'] = "Utilize apenas o email institucional (@estudantes.ips.pt).";
+    header("Location: ../paginas/login.php");
     exit();
 }
 
-// Verifica utilizador no banco
+// 3. Buscar utilizador na Base de Dados
 $sql = "SELECT id_utilizador, nome, tipo, email, password, ativo FROM utilizadores WHERE email = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
 $stmt->execute();
 $result = $stmt->get_result();
 
+// Se não encontrou o email
 if ($result->num_rows === 0) {
-    echo "<script>alert('O seu email não está registado. Contacte a administração.');window.location.href='../paginas/login.php';</script>";
+    $_SESSION['login_erro'] = "Email não encontrado.";
+    header("Location: ../paginas/login.php");
     exit();
 }
 
 $user = $result->fetch_assoc();
 
-// Verifica se está ativo
-if (!$user['ativo']) {
-    echo "<script>alert('Utilizador desativado. Contacte a administração.');window.location.href='../paginas/login.php';</script>";
+// 4. Verificar se está ativo
+if ($user['ativo'] == 0) {
+    $_SESSION['login_erro'] = "A sua conta está desativada. Contacte a administração.";
+    header("Location: ../paginas/login.php");
     exit();
 }
 
-// Verifica senha
+// 5. Verificar Senha
 if ($password_input !== $user['password']) {
-    echo "<script>alert('Palavra-passe incorreta!');window.location.href='../paginas/login.php';</script>";
+    $_SESSION['login_erro'] = "Palavra-passe incorreta.";
+    header("Location: ../paginas/login.php");
     exit();
 }
 
-// Login bem-sucedido
+// --- SUCESSO ---
+
+// Limpar erros antigos
+unset($_SESSION['login_erro']);
+
+// Guardar dados na sessão
 $_SESSION['id_utilizador'] = $user['id_utilizador'];
 $_SESSION['nome'] = $user['nome'];
 $_SESSION['tipo'] = $user['tipo'];
@@ -68,12 +80,8 @@ $_SESSION['logado'] = true;
 $stmt->close();
 $conn->close();
 
-// Redireciona
-if (strtolower(trim($user['tipo'])) === 'administrador') {
-    header("Location: ../paginas/administracao.php");
-    exit();
-} else {
-    header("Location: ../index.php"); // aqui o header.php mostrará "Bem-vindo, nome"
-    exit();
-}
+// --- REDIRECIONAMENTO ---
+// Agora todos vão para a index.php
+header("Location: ../index.php");
+exit();
 ?>
