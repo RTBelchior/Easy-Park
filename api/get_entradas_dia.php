@@ -1,9 +1,6 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: text/plain; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-
-ini_set('display_errors', 0);
-error_reporting(0);
 
 $host = "localhost";
 $utilizador = "root";
@@ -14,7 +11,7 @@ try {
     $conn = new mysqli($host, $utilizador, $senha, $dbname);
     
     if ($conn->connect_error) {
-        throw new Exception("Falha na conexão: " . $conn->connect_error);
+        die("ERRO|Falha na conexão");
     }
     
     $conn->set_charset("utf8");
@@ -30,32 +27,16 @@ try {
     
     if ($result) {
         $row = $result->fetch_assoc();
-        $total_entradas = (int)$row['total_entradas'];
+        $total = (int)$row['total_entradas'];
         
-        if (ob_get_length()) ob_clean();
-        
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'total_entradas' => $total_entradas,
-            'data' => date('Y-m-d')
-        ], JSON_UNESCAPED_UNICODE);
+        echo "SUCCESS|" . $total . "|" . date('Y-m-d');
     } else {
-        throw new Exception("Erro na query: " . $conn->error);
+        echo "ERROR|Erro na query";
     }
     
     $conn->close();
     
 } catch (Exception $e) {
-    if (ob_get_length()) ob_clean();
-    
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Erro ao buscar entradas',
-        'error_details' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo "ERROR|" . $e->getMessage();
 }
-
-exit;
 ?>

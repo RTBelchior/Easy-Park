@@ -1,10 +1,7 @@
 <?php
 session_start();
-header('Content-Type: application/json');
+header('Content-Type: text/plain; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 $host = "localhost";
 $utilizador = "root";
@@ -12,33 +9,25 @@ $senha = "";
 $dbname = "easypark";
 
 try {
-    // Verificar se o utilizador está logado
     if (!isset($_SESSION['id_utilizador'])) {
-        http_response_code(401);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Utilizador não autenticado'
-        ], JSON_UNESCAPED_UNICODE);
-        exit;
+        die("ERROR|Não autenticado");
     }
     
     $conn = new mysqli($host, $utilizador, $senha, $dbname);
     
     if ($conn->connect_error) {
-        throw new Exception("Falha na conexão: " . $conn->connect_error);
+        die("ERROR|Falha na conexão");
     }
+    
+    $conn->set_charset("utf8");
     
     $id_utilizador = $_SESSION['id_utilizador'];
     
-    // Buscar dados do utilizador
     $sql = "
         SELECT 
-            id_utilizador,
             nome,
-            numero,
             tipo,
-            email,
-            ativo
+            email
         FROM utilizadores
         WHERE id_utilizador = ?
     ";
@@ -51,52 +40,31 @@ try {
     if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
         
-        // Traduzir tipo de utilizador
-        $tipos = [
-            'aluno' => 'Aluno',
-            'professor' => 'Professor',
-            'administrador' => 'Administrador',
-            'funcionario' => 'Funcionário'
-        ];
-        
-        $user['tipo_formatado'] = $tipos[$user['tipo']] ?? $user['tipo'];
-        
-        // Criar iniciais do nome
+        // Criar iniciais
         $palavras = explode(' ', $user['nome']);
-        $iniciais = '';
-        
         if (count($palavras) >= 2) {
-            // Primeira letra do primeiro e último nome
             $iniciais = strtoupper(substr($palavras[0], 0, 1) . substr($palavras[count($palavras) - 1], 0, 1));
         } else {
-            // Primeiras duas letras do nome
             $iniciais = strtoupper(substr($user['nome'], 0, 2));
         }
         
-        $user['iniciais'] = $iniciais;
+        // Traduzir tipo
+        $tipos = [
+            'administrador' => 'Administrador',
+            'funcionario' => 'Funcionário',
+            'cliente' => 'Cliente'
+        ];
+        $tipo_formatado = $tipos[$user['tipo']] ?? $user['tipo'];
         
-        http_response_code(200);
-        echo json_encode([
-            'success' => true,
-            'user' => $user
-        ], JSON_UNESCAPED_UNICODE);
+        echo "SUCCESS|" . $user['nome'] . "|" . $tipo_formatado . "|" . $iniciais . "|" . $user['email'];
     } else {
-        http_response_code(404);
-        echo json_encode([
-            'success' => false,
-            'error' => 'Utilizador não encontrado'
-        ], JSON_UNESCAPED_UNICODE);
+        echo "ERROR|Utilizador não encontrado";
     }
     
     $stmt->close();
     $conn->close();
     
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Erro ao buscar dados do utilizador',
-        'error_details' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo "ERROR|" . $e->getMessage();
 }
 ?>

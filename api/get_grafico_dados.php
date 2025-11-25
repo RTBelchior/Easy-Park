@@ -1,9 +1,6 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
+header('Content-Type: text/plain; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
-
-ini_set('display_errors', 0);
-error_reporting(0);
 
 $host = "localhost";
 $utilizador = "root";
@@ -14,7 +11,7 @@ try {
     $conn = new mysqli($host, $utilizador, $senha, $dbname);
     
     if ($conn->connect_error) {
-        throw new Exception("Falha na conexão: " . $conn->connect_error);
+        die("ERROR|Falha na conexão");
     }
     
     $conn->set_charset("utf8");
@@ -27,13 +24,11 @@ try {
     
     $num_dias = cal_days_in_month(CAL_GREGORIAN, $mes, $ano);
     
-    $dias = [];
     $entradas = [];
     $saidas = [];
     
     for ($dia = 1; $dia <= $num_dias; $dia++) {
         $data = sprintf("%04d-%02d-%02d", $ano, $mes, $dia);
-        $dias[] = $dia;
         
         // Contar entradas
         $sql_entradas = "
@@ -66,30 +61,11 @@ try {
         $stmt->close();
     }
     
-    if (ob_get_length()) ob_clean();
-    
-    http_response_code(200);
-    echo json_encode([
-        'success' => true,
-        'mes' => $mes,
-        'ano' => $ano,
-        'dias' => $dias,
-        'entradas' => $entradas,
-        'saidas' => $saidas
-    ], JSON_UNESCAPED_UNICODE);
+    echo "SUCCESS|" . $mes . "|" . $ano . "|" . implode(",", $entradas) . "|" . implode(",", $saidas);
     
     $conn->close();
     
 } catch (Exception $e) {
-    if (ob_get_length()) ob_clean();
-    
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'error' => 'Erro ao buscar dados',
-        'error_details' => $e->getMessage()
-    ], JSON_UNESCAPED_UNICODE);
+    echo "ERROR|" . $e->getMessage();
 }
-
-exit;
 ?>

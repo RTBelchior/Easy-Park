@@ -271,7 +271,7 @@ if (session_status() === PHP_SESSION_NONE) {
   <?php include('footer.php'); ?>
 
   <script>
-    async function fetchParkingAvailability() {
+   async function fetchParkingAvailability() {
       try {
         const response = await fetch('../api/get_disponibilidade.php');
         
@@ -279,35 +279,45 @@ if (session_status() === PHP_SESSION_NONE) {
           throw new Error(`Erro HTTP: ${response.status}`);
         }
         
-        const responseText = await response.text();
-        console.log('Resposta do servidor:', responseText);
+        const text = await response.text();
+        console.log('📥 Resposta do servidor:', text);
         
-        let data;
-        try {
-          data = JSON.parse(responseText);
-        } catch (e) {
-          console.error('Erro ao fazer parse do JSON:', e);
-          throw new Error('Resposta inválida do servidor');
-        }
+        // Parse manual do formato texto
+        const firstPipe = text.indexOf('|');
+        const secondPipe = text.indexOf('|', firstPipe + 1);
+        const thirdPipe = text.indexOf('|', secondPipe + 1);
         
-        if (data.success) {
-          // Atualizar cada parque
-          for (let i = 1; i <= 3; i++) {
-            if (data.parques[i]) {
-              const disponivel = data.parques[i].disponivel;
-              const maxima = data.parques[i].lotacao_maxima;
-              
-              updateParkingCard(i, disponivel, maxima);
-            }
-          }
+        const status = text.substring(0, firstPipe);
+        const totalMax = parseInt(text.substring(firstPipe + 1, secondPipe));
+        const totalAtual = parseInt(text.substring(secondPipe + 1, thirdPipe));
+        const parquesStr = text.substring(thirdPipe + 1);
+        
+        console.log('📊 Status:', status);
+        console.log('🏢 Parques:', parquesStr);
+        
+        if (status === 'SUCCESS') {
+          // Processar cada parque
+          const parquesArray = parquesStr.split(';');
           
-          console.log('Dados carregados com sucesso');
+          parquesArray.forEach(parqueStr => {
+            const parts = parqueStr.trim().split('|');
+            const id = parseInt(parts[0]);
+            const max = parseInt(parts[1]);
+            const atual = parseInt(parts[2]);
+            const disponivel = max - atual;
+            
+            console.log(`✅ Parque ${id}: ${disponivel} disponíveis (${atual}/${max})`);
+            
+            updateParkingCard(id, disponivel, max);
+          });
+          
+          console.log('✅ Dados carregados com sucesso');
         } else {
-          throw new Error(data.error || 'Erro desconhecido');
+          throw new Error('Erro ao buscar dados');
         }
         
       } catch (error) {
-        console.error('Erro ao carregar disponibilidade:', error);
+        console.error('❌ Erro ao carregar disponibilidade:', error);
         
         // Mostrar erro em todos os cards
         for (let i = 1; i <= 3; i++) {
@@ -349,7 +359,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
     // Carregar dados ao iniciar a página
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('Página carregada, buscando disponibilidade...');
+      console.log('🚀 Página carregada, buscando disponibilidade...');
       fetchParkingAvailability();
       
       // Atualizar automaticamente a cada 30 segundos

@@ -110,7 +110,7 @@
     <div class="test-section">
         <h2>1️⃣ API de Disponibilidade</h2>
         <button onclick="testarDisponibilidade()">🧪 Testar API</button>
-        <button onclick="abrirNoNavegador('../api/get_disponibilidade.php')">🌐 Abrir no Navegador</button>
+        <button onclick="abrirNoNavegador('api/get_disponibilidade.php')">🌐 Abrir no Navegador</button>
         <span id="status-disp" class="status" style="display:none"></span>
         <div id="result-disp" class="result" style="display:none"></div>
     </div>
@@ -119,7 +119,7 @@
     <div class="test-section">
         <h2>2️⃣ API de Entradas do Dia</h2>
         <button onclick="testarEntradas()">🧪 Testar API</button>
-        <button onclick="abrirNoNavegador('../api/get_entradas_dia.php')">🌐 Abrir no Navegador</button>
+        <button onclick="abrirNoNavegador('api/get_entradas_dia.php')">🌐 Abrir no Navegador</button>
         <span id="status-ent" class="status" style="display:none"></span>
         <div id="result-ent" class="result" style="display:none"></div>
     </div>
@@ -128,7 +128,7 @@
     <div class="test-section">
         <h2>3️⃣ API de Dados do Gráfico</h2>
         <button onclick="testarGrafico()">🧪 Testar API</button>
-        <button onclick="abrirNoNavegador('../api/get_grafico_dados.php?mes=11&ano=2025')">🌐 Abrir no Navegador</button>
+        <button onclick="abrirNoNavegador('api/get_grafico_dados.php?mes=11&ano=2025')">🌐 Abrir no Navegador</button>
         <span id="status-graf" class="status" style="display:none"></span>
         <div id="result-graf" class="result" style="display:none"></div>
     </div>
@@ -137,7 +137,7 @@
     <div class="test-section">
         <h2>4️⃣ API de Informações do Utilizador</h2>
         <button onclick="testarUser()">🧪 Testar API</button>
-        <button onclick="abrirNoNavegador('../api/get_user_info.php')">🌐 Abrir no Navegador</button>
+        <button onclick="abrirNoNavegador('api/get_user_info.php')">🌐 Abrir no Navegador</button>
         <span id="status-user" class="status" style="display:none"></span>
         <div id="result-user" class="result" style="display:none"></div>
     </div>
@@ -176,36 +176,64 @@ WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
                 const response = await fetch('../api/get_disponibilidade.php');
                 const text = await response.text();
                 
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    throw new Error('Resposta não é um JSON válido:\n' + text);
-                }
+                console.log('📥 Resposta bruta:', text);
+                console.log('📥 Tipo da resposta:', typeof text);
                 
-                if (data.success) {
+                // Split principal por pipe
+                const parts = text.trim().split('|');
+                console.log('🔍 Parts:', parts);
+                
+                if (parts[0] === 'SUCCESS') {
                     statusSpan.textContent = '✓ Sucesso';
                     statusSpan.className = 'status success';
                     statusSpan.style.display = 'inline-block';
                     
+                    const totalMax = parseInt(parts[1]);
+                    const totalAtual = parseInt(parts[2]);
+                    const totalDisp = totalMax - totalAtual;
+                    const parquesStr = parts[3];
+                    
+                    console.log('🏢 String dos parques:', parquesStr);
+                    
+                    let parquesInfo = '';
+                    
+                    // Split dos parques por ponto e vírgula
+                    const parquesArray = parquesStr.split(';');
+                    console.log('🏢 Array de parques:', parquesArray);
+                    
+                    parquesArray.forEach((parqueStr, index) => {
+                        console.log(`🏢 Processando parque ${index}:`, parqueStr);
+                        
+                        // Split de cada parque por pipe
+                        const parqueParts = parqueStr.split('|');
+                        console.log(`   Parts do parque:`, parqueParts);
+                        
+                        const id = parseInt(parqueParts[0]);
+                        const max = parseInt(parqueParts[1]);
+                        const atual = parseInt(parqueParts[2]);
+                        const disp = max - atual;
+                        
+                        console.log(`   ID: ${id}, Max: ${max}, Atual: ${atual}, Disp: ${disp}`);
+                        
+                        parquesInfo += `   Parque ${id}: ${atual}/${max} (${disp} livres)\n`;
+                    });
+                    
                     resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
                         `📊 TOTAL:\n` +
-                        `   Lotação Máxima: ${data.total.lotacao_maxima}\n` +
-                        `   Lotação Atual: ${data.total.lotacao_atual}\n` +
-                        `   Disponível: ${data.total.disponivel}\n\n` +
-                        `📍 PARQUES:\n` +
-                        Object.values(data.parques).map(p => 
-                            `   Parque ${p.id_parque}: ${p.lotacao_atual}/${p.lotacao_maxima} (${p.disponivel} livres)`
-                        ).join('\n') +
-                        `\n\n📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                        `   Lotação Máxima: ${totalMax}\n` +
+                        `   Lotação Atual: ${totalAtual}\n` +
+                        `   Disponível: ${totalDisp}\n\n` +
+                        `📍 PARQUES:\n${parquesInfo}\n` +
+                        `📋 Resposta Bruta:\n${text}`;
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(parts[1] || 'Erro desconhecido');
                 }
             } catch (error) {
                 statusSpan.textContent = '✗ Erro';
                 statusSpan.className = 'status error';
                 statusSpan.style.display = 'inline-block';
-                resultDiv.innerHTML = `❌ ERRO:\n${error.message}`;
+                resultDiv.innerHTML = `❌ ERRO:\n${error.message}\n\nVerifique o Console (F12) para mais detalhes`;
+                console.error('❌ Erro completo:', error);
             }
         }
 
@@ -218,20 +246,27 @@ WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
             statusSpan.style.display = 'none';
             
             try {
-                const response = await fetch('api/get_entradas_dia.php');
-                const data = await response.json();
+                const response = await fetch('../api/get_entradas_dia.php');
+                const text = await response.text();
                 
-                if (data.success) {
+                console.log('📥 Resposta bruta:', text);
+                
+                const parts = text.split('|');
+                
+                if (parts[0] === 'SUCCESS') {
                     statusSpan.textContent = '✓ Sucesso';
                     statusSpan.className = 'status success';
                     statusSpan.style.display = 'inline-block';
                     
+                    const total = parseInt(parts[1]);
+                    const data = parts[2];
+                    
                     resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
-                        `🚗 Total de Entradas Hoje: ${data.total_entradas}\n` +
-                        `📅 Data: ${data.data}\n\n` +
-                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                        `🚗 Total de Entradas Hoje: ${total}\n` +
+                        `📅 Data: ${data}\n\n` +
+                        `📋 Resposta Bruta:\n${text}`;
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(parts[1] || 'Erro desconhecido');
                 }
             } catch (error) {
                 statusSpan.textContent = '✗ Erro';
@@ -251,24 +286,36 @@ WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
             
             try {
                 const response = await fetch('../api/get_grafico_dados.php?mes=11&ano=2025');
-                const data = await response.json();
+                const text = await response.text();
                 
-                if (data.success) {
+                console.log('📥 Resposta bruta:', text);
+                
+                const parts = text.split('|');
+                
+                if (parts[0] === 'SUCCESS') {
                     statusSpan.textContent = '✓ Sucesso';
                     statusSpan.className = 'status success';
                     statusSpan.style.display = 'inline-block';
                     
-                    const totalEntradas = data.entradas.reduce((a, b) => a + b, 0);
-                    const totalSaidas = data.saidas.reduce((a, b) => a + b, 0);
+                    const mes = parseInt(parts[1]);
+                    const ano = parseInt(parts[2]);
+                    const entradas = parts[3].split(',').map(Number);
+                    const saidas = parts[4].split(',').map(Number);
+                    
+                    const totalEntradas = entradas.reduce((a, b) => a + b, 0);
+                    const totalSaidas = saidas.reduce((a, b) => a + b, 0);
                     
                     resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
-                        `📅 Período: ${data.mes}/${data.ano}\n` +
+                        `📅 Período: ${mes}/${ano}\n` +
                         `📊 Total de Entradas: ${totalEntradas}\n` +
                         `📊 Total de Saídas: ${totalSaidas}\n` +
-                        `📈 Dias com dados: ${data.dias.length}\n\n` +
-                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                        `📈 Dias com dados: ${entradas.length}\n\n` +
+                        `📋 Primeiros 10 dias:\n` +
+                        `   Entradas: ${entradas.slice(0, 10).join(', ')}\n` +
+                        `   Saídas: ${saidas.slice(0, 10).join(', ')}\n\n` +
+                        `📋 Resposta Bruta (truncada):\n${text.substring(0, 200)}...`;
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(parts[1] || 'Erro desconhecido');
                 }
             } catch (error) {
                 statusSpan.textContent = '✗ Erro';
@@ -288,31 +335,40 @@ WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
             
             try {
                 const response = await fetch('../api/get_user_info.php');
-                const data = await response.json();
+                const text = await response.text();
                 
-                if (data.success) {
+                console.log('📥 Resposta bruta:', text);
+                
+                const parts = text.split('|');
+                
+                if (parts[0] === 'SUCCESS') {
                     statusSpan.textContent = '✓ Sucesso';
                     statusSpan.className = 'status success';
                     statusSpan.style.display = 'inline-block';
                     
+                    const nome = parts[1];
+                    const tipo = parts[2];
+                    const iniciais = parts[3];
+                    const email = parts[4];
+                    
                     resultDiv.innerHTML = `✅ API FUNCIONANDO!\n\n` +
-                        `👤 Nome: ${data.user.nome}\n` +
-                        `🎫 Tipo: ${data.user.tipo_formatado}\n` +
-                        `📧 Email: ${data.user.email}\n` +
-                        `🔤 Iniciais: ${data.user.iniciais}\n\n` +
-                        `📋 JSON Completo:\n${JSON.stringify(data, null, 2)}`;
+                        `👤 Nome: ${nome}\n` +
+                        `🎫 Tipo: ${tipo}\n` +
+                        `🔤 Iniciais: ${iniciais}\n` +
+                        `📧 Email: ${email}\n\n` +
+                        `📋 Resposta Bruta:\n${text}`;
                 } else {
-                    throw new Error(data.error || 'Erro desconhecido');
+                    throw new Error(parts[1] || 'Erro desconhecido');
                 }
             } catch (error) {
                 statusSpan.textContent = '✗ Erro';
                 statusSpan.className = 'status error';
                 statusSpan.style.display = 'inline-block';
                 
-                if (error.message.includes('401') || error.message.includes('autenticado')) {
+                if (error.message.includes('autenticado')) {
                     resultDiv.innerHTML = `⚠️ UTILIZADOR NÃO AUTENTICADO\n\n` +
                         `Para testar esta API:\n` +
-                        `1. Acesse: test_session.php\n` +
+                        `1. Acesse: ../test_session.php\n` +
                         `2. Depois volte aqui e teste novamente\n\n` +
                         `Erro: ${error.message}`;
                 } else {
@@ -324,6 +380,7 @@ WHERE tipo_acesso='entrada' AND DATE(data_hora)=CURDATE();</pre>
         // Auto-testar ao carregar
         window.addEventListener('DOMContentLoaded', () => {
             console.log('🧪 Página de testes carregada!');
+            console.log('📝 As APIs agora retornam TEXTO em vez de JSON');
         });
     </script>
 </body>
