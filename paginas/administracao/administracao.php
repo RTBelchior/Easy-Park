@@ -3,9 +3,9 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verifica se está logado e se é administrador (segurança extra)
+// Verifica se está logado e se é administrador
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
-    header("Location: ../paginas/login.php");
+    header("Location: ../login.php");
     exit();
 }
 ?>
@@ -17,50 +17,20 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPark - Painel Administrativo</title>
-    <link rel="stylesheet" href="../css/administracao.css">
+    <!-- Atenção aos caminhos do CSS -->
+    <link rel="stylesheet" href="../../css/administracao.css"> 
     <style>
-        /* Fix para emojis que podem não carregar corretamente */
-        .logo::before {
-            content: "🚧";
-        }
+        .logo::before { content: "🚧"; }
+        .chart-section { width: 100%; box-sizing: border-box; }
     </style>
 </head>
 
 <body>
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-        <div class="logo">EasyPark</div>
+    
+    <!-- Inclui a Sidebar Lateral -->
+    <?php include 'sidebar.php'; ?>
 
-        <div class="menu-section">
-            <div class="menu-label">Menu</div>
-            <a href="#" class="menu-item active" onclick="showSection('lotacoes')">
-                <span class="menu-item-icon">📊</span>
-                <span>Lotações</span>
-            </a>
-            <a href="#" class="menu-item" onclick="showSection('grafico')">
-                <span class="menu-item-icon">📈</span>
-                <span>Gráfico</span>
-            </a>
-        </div>
-
-        <div class="menu-section">
-            <div class="menu-label">Ferramentas</div>
-            <a href="#" class="menu-item">
-                <span class="menu-item-icon">📝</span>
-                <span>Relatórios</span>
-            </a>
-        </div>
-
-        <!-- MUDANÇA AQUI: Voltar ao Início no fundo -->
-        <div class="sidebar-footer">
-            <a href="../index.php" class="menu-item">
-                <span class="menu-item-icon">🏠</span>
-                <span>Voltar ao Início</span>
-            </a>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
+    <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
         <!-- HEADER -->
         <div class="header">
@@ -77,9 +47,10 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
             </div>
         </div>
 
-        <!-- SEÇÃO LOTAÇÕES -->
-        <div id="section-lotacoes">
-            <!-- STATS GRID -->
+        <!-- DASHBOARD COMPLETO -->
+        <div id="section-lotacoes" style="display: block;">
+            
+            <!-- 1. GRID DE ESTATÍSTICAS -->
             <div class="stats-grid">
                 <!-- Lotação Total -->
                 <div class="stat-card primary">
@@ -136,22 +107,21 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     <div class="stat-subtitle">Veículos vs ontem</div>
                 </div>
 
-                <!--Visitas do Site -->
+                <!-- Utilizadores (ATUALIZADO) -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">🧑‍🤝‍🧑</div>
-                        <span class="stat-badge badge-success">+0%</span>
+                        <span class="stat-badge badge-success">Total</span>
                     </div>
-                    <div class="stat-title">Visitas Hoje</div>
-                    <div class="stat-value" id="visitas-hoje">--</div>
-                    <div class="stat-subtitle">Visualizações</div>
+                    <div class="stat-title">Utilizadores</div>
+                    <!-- Mudei o ID para total-users para ser mais claro -->
+                    <div class="stat-value" id="total-users">--</div>
+                    <div class="stat-subtitle">Registados na BD</div>
                 </div>
             </div>
-        </div>
 
-        <!-- SEÇÃO GRÁFICO -->
-        <div id="section-grafico" style="display: none;">
-            <div class="chart-section">
+            <!-- 2. SECÇÃO DO GRÁFICO -->
+            <div class="chart-section" style="margin-top: 30px;">
                 <div class="chart-header">
                     <div>
                         <div class="chart-title">Entradas e Saídas</div>
@@ -192,6 +162,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     </div>
                 </div>
             </div>
+
         </div>
     </main>
 
@@ -199,25 +170,14 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <script>
         let trafficChart = null;
 
-        // Alternar entre seções
         function showSection(section) {
-            document.getElementById('section-lotacoes').style.display = section === 'lotacoes' ? 'block' : 'none';
-            document.getElementById('section-grafico').style.display = section === 'grafico' ? 'block' : 'none';
-
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-
-            if (section === 'grafico' && !trafficChart) {
-                initChart();
-            }
+            console.log("Navegação simplificada: tudo numa página.");
         }
 
-        // Buscar dados do utilizador
+        // --- FETCH USER INFO ---
         async function fetchUserInfo() {
             try {
-                const response = await fetch('../api/get_user_info.php');
+                const response = await fetch('../../api/get_user_info.php');
                 const text = await response.text();
                 const parts = text.split('|');
 
@@ -234,99 +194,91 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 
                     const userRole = document.querySelector('.user-role');
                     if (userRole) userRole.textContent = tipo;
-
-                } else {
-                    console.log('⚠️ Não autenticado');
                 }
-            } catch (error) {
-                console.log('⚠️ Erro ao buscar utilizador:', error.message);
-            }
+            } catch (error) { console.log('Erro user info:', error); }
         }
 
-        // Buscar dados de lotação
+        // --- FETCH LOTAÇÃO ---
         async function fetchLotacaoData() {
             try {
-                const response = await fetch('../api/get_disponibilidade.php');
+                const response = await fetch('../../api/get_disponibilidade.php');
                 const text = await response.text().then(t => t.trim());
 
-                // Split apenas nos primeiros 3 pipes
                 const firstPipeIndex = text.indexOf('|');
                 const secondPipeIndex = text.indexOf('|', firstPipeIndex + 1);
                 const thirdPipeIndex = text.indexOf('|', secondPipeIndex + 1);
 
                 const status = text.substring(0, firstPipeIndex);
-                const totalMax = parseInt(text.substring(firstPipeIndex + 1, secondPipeIndex));
-                const totalAtual = parseInt(text.substring(secondPipeIndex + 1, thirdPipeIndex));
-                const parquesStr = text.substring(thirdPipeIndex + 1);
+                
+                if (status === 'SUCCESS' && thirdPipeIndex !== -1) {
+                    const totalAtual = parseInt(text.substring(secondPipeIndex + 1, thirdPipeIndex));
+                    const parquesStr = text.substring(thirdPipeIndex + 1);
 
-                if (status === 'SUCCESS') {
-                    // Atualizar total
                     const lotacaoTotalEl = document.getElementById('lotacao-total');
-                    if (lotacaoTotalEl) {
-                        lotacaoTotalEl.textContent = totalAtual;
-                    }
+                    if (lotacaoTotalEl) lotacaoTotalEl.textContent = totalAtual;
 
-                    // Processar cada parque
                     const parquesArray = parquesStr.split(';');
+                    parquesArray.forEach((parqueStr) => {
+                        const parts = parqueStr.trim().split('|');
+                        if(parts.length >= 3){
+                            const id = parseInt(parts[0]);
+                            const max = parseInt(parts[1]);
+                            const atual = parseInt(parts[2]);
 
-                    parquesArray.forEach((parqueStr, index) => {
-                        const parqueParts = parqueStr.trim().split('|');
-                        const id = parseInt(parqueParts[0]);
-                        const max = parseInt(parqueParts[1]);
-                        const atual = parseInt(parqueParts[2]);
+                            const el = document.getElementById(`lotacao-${id}`);
+                            if (el) el.textContent = atual;
+                            
+                            const sub = document.getElementById(`subtitle-${id}`);
+                            if (sub) sub.textContent = `de ${max} lugares`;
 
-                        const lotacaoEl = document.getElementById(`lotacao-${id}`);
-                        if (lotacaoEl) {
-                            lotacaoEl.textContent = atual;
-                        }
-
-                        const subtitleEl = document.getElementById(`subtitle-${id}`);
-                        if (subtitleEl) {
-                            subtitleEl.textContent = `de ${max} lugares`;
-                        }
-
-                        const badge = document.getElementById(`badge-${id}`);
-                        if (badge) {
-                            const percentagem = (atual / max) * 100;
-
-                            if (percentagem >= 90) {
-                                badge.textContent = 'Lotado';
-                                badge.className = 'stat-badge badge-danger';
-                            } else if (percentagem >= 70) {
-                                badge.textContent = 'Quase Cheio';
-                                badge.className = 'stat-badge badge-warning';
-                            } else {
-                                badge.textContent = 'Disponível';
-                                badge.className = 'stat-badge badge-success';
+                            const badge = document.getElementById(`badge-${id}`);
+                            if (badge) {
+                                const percentagem = (atual / max) * 100;
+                                if (percentagem >= 90) {
+                                    badge.textContent = 'Lotado';
+                                    badge.className = 'stat-badge badge-danger';
+                                } else if (percentagem >= 70) {
+                                    badge.textContent = 'Quase Cheio';
+                                    badge.className = 'stat-badge badge-warning';
+                                } else {
+                                    badge.textContent = 'Disponível';
+                                    badge.className = 'stat-badge badge-success';
+                                }
                             }
                         }
                     });
                 }
-            } catch (error) {
-                console.error('❌ Erro ao buscar lotação:', error.message);
-            }
+            } catch (error) { console.error('Erro lotação:', error); }
         }
 
-        // Buscar entradas de hoje
+        // --- FETCH ENTRADAS HOJE ---
         async function fetchEntradasHoje() {
             try {
-                const response = await fetch('../api/get_entradas_dia.php');
+                const response = await fetch('../../api/get_entradas_dia.php');
                 const text = await response.text();
                 const parts = text.split('|');
-
                 if (parts[0] === 'SUCCESS') {
-                    const total = parseInt(parts[1]);
-                    const entradasEl = document.getElementById('entradas-hoje');
-                    if (entradasEl) {
-                        entradasEl.textContent = total;
-                    }
+                    const el = document.getElementById('entradas-hoje');
+                    if(el) el.textContent = parts[1];
                 }
-            } catch (error) {
-                console.error('❌ Erro ao buscar entradas:', error.message);
-            }
+            } catch (error) { console.error('Erro entradas:', error); }
         }
 
-        // Inicializar gráfico
+        // --- TOTAL UTILIZADORES ---
+        async function fetchTotalUsers() {
+            try {
+                const response = await fetch('../../api/get_total_users.php');
+                const text = await response.text();
+                const parts = text.split('|');
+                
+                if (parts[0] === 'SUCCESS') {
+                    const el = document.getElementById('total-users');
+                    if(el) el.textContent = parts[1];
+                }
+            } catch (error) { console.error('Erro total users:', error); }
+        }
+
+        // --- INICIALIZAR GRÁFICO ---
         function initChart() {
             const ctx = document.getElementById('trafficChart').getContext('2d');
             trafficChart = new Chart(ctx, {
@@ -334,47 +286,24 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                 data: {
                     labels: [],
                     datasets: [
-                        {
-                            label: 'Entradas',
-                            data: [],
-                            backgroundColor: '#3b82f6',
-                            borderRadius: 8
-                        },
-                        {
-                            label: 'Saídas',
-                            data: [],
-                            backgroundColor: '#94a3b8',
-                            borderRadius: 8
-                        }
+                        { label: 'Entradas', data: [], backgroundColor: '#3b82f6', borderRadius: 8 },
+                        { label: 'Saídas', data: [], backgroundColor: '#94a3b8', borderRadius: 8 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: {
-                                color: '#f1f5f9'
-                            }
-                        },
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        }
+                        y: { beginAtZero: true, grid: { color: '#f1f5f9' } },
+                        x: { grid: { display: false } }
                     }
                 }
             });
             updateChart();
         }
 
-        // Atualizar gráfico
+        // --- ATUALIZAR DADOS GRÁFICO ---
         async function updateChart() {
             if (!trafficChart) return;
 
@@ -382,7 +311,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
             const year = document.getElementById('yearSelect').value;
 
             try {
-                const response = await fetch(`../api/get_grafico_dados.php?mes=${month}&ano=${year}`);
+                const response = await fetch(`../../api/get_grafico_dados.php?mes=${month}&ano=${year}`);
                 const text = await response.text();
                 const parts = text.split('|');
 
@@ -396,36 +325,34 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     trafficChart.data.datasets[1].data = saidas;
                     trafficChart.update();
                 }
-            } catch (error) {
-                console.error('❌ Erro ao buscar gráfico:', error);
-            }
+            } catch (error) { console.error('Erro gráfico:', error); }
         }
 
-        // Atualizar data
+        // --- ATUALIZAR DATA HEADER ---
         function updateDate() {
             const days = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'];
             const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-
             const now = new Date();
             const dateStr = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
-
-            const subtitle = document.querySelector('.header-subtitle');
-            if (subtitle) {
-                subtitle.textContent = dateStr;
-            }
+            
+            const sub = document.querySelector('.header-subtitle');
+            if(sub) sub.textContent = dateStr;
         }
 
-        // Inicializar
+        // --- START ---
         document.addEventListener('DOMContentLoaded', function () {
             updateDate();
             fetchUserInfo();
             fetchLotacaoData();
             fetchEntradasHoje();
+            fetchTotalUsers(); // <--- Chama a nova função
+            initChart();
 
-            // Atualizar a cada 30 segundos
+            // Atualizar dados a cada 30s
             setInterval(() => {
                 fetchLotacaoData();
                 fetchEntradasHoje();
+                fetchTotalUsers(); // <--- Atualiza periodicamente
             }, 30000);
         });
     </script>

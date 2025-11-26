@@ -22,9 +22,9 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     $tipo_user = $_SESSION['tipo'] ?? 'cliente';
 
     if ($tipo_user === 'Administrador') {
-        $link_administracao = '/Easy-Park/paginas/administracao.php';
+        $link_administracao = '/Easy-Park/paginas/administracao/administracao.php';
     } else {
-        $link_administracao = '/Easy-Park/paginas/registoEntradas.php';
+        $link_administracao = '/Easy-Park/paginas/administracao/registoEntradas.php';
     }
 }
 ?>
