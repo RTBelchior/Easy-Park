@@ -28,15 +28,20 @@ if (empty($email) || empty($password_input)) {
     exit();
 }
 
-// 2. Validação de Formato de Email
-if (!preg_match("/^[0-9]+@estudantes\.ips\.pt$/", $email) && $email !== "admin@estudantes.ips.pt") {
-    $_SESSION['login_erro'] = "Utilize apenas o email institucional (@estudantes.ips.pt).";
+// 2. Validação de Formato de Email (ATUALIZADA)
+// Agora permite: qualquercoisa@estudantes.ips.pt OU qualquercoisa@estsetubal.ips.pt
+if (!preg_match("/^.+@(estudantes\.ips\.pt|estsetubal\.ips\.pt)$/", $email)) {
+    $_SESSION['login_erro'] = "Utilize um email institucional válido (IPS).";
     header("Location: ../paginas/login.php");
     exit();
 }
 
 // 3. Buscar utilizador na Base de Dados
-$sql = "SELECT id_utilizador, nome, tipo, email, password, ativo FROM utilizadores WHERE email = ?";
+// NOTA: Ajustei os nomes das colunas para bater certo com a tua BD (ex: email_utilizador)
+$sql = "SELECT id_utilizador, nome_utilizador, id_tipo_utilizador, email_utilizador, password_utilizador, ativo_utilizador 
+        FROM utilizadores 
+        WHERE email_utilizador = ?";
+
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -51,15 +56,15 @@ if ($result->num_rows === 0) {
 
 $user = $result->fetch_assoc();
 
-// 4. Verificar se está ativo
-if ($user['ativo'] == 0) {
+// 4. Verificar se está ativo (ativo_utilizador)
+if ($user['ativo_utilizador'] == 0) {
     $_SESSION['login_erro'] = "A sua conta está desativada. Contacte a administração.";
     header("Location: ../paginas/login.php");
     exit();
 }
 
-// 5. Verificar Senha
-if ($password_input !== $user['password']) {
+// 5. Verificar Senha (password_utilizador)
+if ($password_input !== $user['password_utilizador']) {
     $_SESSION['login_erro'] = "Palavra-passe incorreta.";
     header("Location: ../paginas/login.php");
     exit();
@@ -70,18 +75,17 @@ if ($password_input !== $user['password']) {
 // Limpar erros antigos
 unset($_SESSION['login_erro']);
 
-// Guardar dados na sessão
+// Guardar dados na sessão (Mantendo os nomes de sessão simples para usares no site)
 $_SESSION['id_utilizador'] = $user['id_utilizador'];
-$_SESSION['nome'] = $user['nome'];
-$_SESSION['tipo'] = $user['tipo'];
-$_SESSION['email'] = $user['email'];
+$_SESSION['nome'] = $user['nome_utilizador'];
+$_SESSION['tipo'] = $user['id_tipo_utilizador']; // Guarda o ID do tipo (1, 2, 3...)
+$_SESSION['email'] = $user['email_utilizador'];
 $_SESSION['logado'] = true;
 
 $stmt->close();
 $conn->close();
 
 // --- REDIRECIONAMENTO ---
-// Agora todos vão para a index.php
 header("Location: ../index.php");
 exit();
 ?>

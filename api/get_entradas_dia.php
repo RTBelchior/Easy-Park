@@ -18,9 +18,9 @@ try {
     
     $sql = "
         SELECT COUNT(*) as total_entradas
-        FROM historico_acesso
+        FROM acesso
         WHERE tipo_acesso = 'entrada'
-        AND DATE(data_hora) = CURDATE()
+        AND DATE(data_hora_acesso) = CURDATE()
     ";
     
     $result = $conn->query($sql);

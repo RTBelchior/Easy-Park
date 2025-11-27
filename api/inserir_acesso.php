@@ -1,68 +1,98 @@
 <?php
-header("Content-Type: application/json; charset=UTF-8");
+header("Content-Type: text/plain; charset=UTF-8");
 
 $conn = new mysqli("localhost", "root", "", "easypark");
-
 if ($conn->connect_error) {
-    die(json_encode(["status" => "erro", "mensagem" => "Falha na ligação à base de dados"]));
+    die("ERRO|Falha na BD");
 }
 
-// RECEBE DADOS
 $numero_cartao = $_POST['numero_cartao'] ?? null;
 $id_parque = $_POST['id_parque'] ?? 1;
 
 if (!$numero_cartao) {
-    echo json_encode(["status" => "erro", "mensagem" => "numero_cartao não enviado"]);
-    exit;
+    die("ERRO|Cartao nao enviado");
 }
 
-// VALIDAR CARTÃO
-$sql = "SELECT id_cartao FROM cartoes WHERE numero_cartao = ? AND ativo = 1";
+/* 1) Verificar se o cartão existe e está ativo */
+$sql = "SELECT id_cartao FROM cartoes WHERE numero_cartao = ? AND ativo_cartao = 1";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $numero_cartao);
 $stmt->execute();
-$result = $stmt->get_result();
+$res = $stmt->get_result();
 
-if ($result->num_rows == 0) {
-    echo json_encode(["status" => "erro", "mensagem" => "Cartão inválido ou inativo"]);
-    exit;
+if ($res->num_rows == 0) {
+    die("NEGADO|Cartao inativo");
 }
 
-$row = $result->fetch_assoc();
+$row = $res->fetch_assoc();
 $id_cartao = $row['id_cartao'];
 
-// BUSCAR ÚLTIMO ACESSO
-$sql_last = "SELECT tipo_acesso FROM historico_acesso 
-             WHERE id_cartao = ?
-             ORDER BY data_hora DESC 
-             LIMIT 1";
+/* 2) Verificar se tem permissão para este parque */
+$sql = "SELECT 1 FROM cartao_parque WHERE id_cartao = ? AND id_parque = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("ii", $id_cartao, $id_parque);
+$stmt->execute();
+$res = $stmt->get_result();
 
-$stmt_last = $conn->prepare($sql_last);
-$stmt_last->bind_param("i", $id_cartao);
-$stmt_last->execute();
-$res_last = $stmt_last->get_result();
-
-// DEFINIR ENTRADA OU SAÍDA
-if ($res_last->num_rows == 0) {
-    $tipo_acesso = "entrada";  // primeira vez
-} else {
-    $ultimo = $res_last->fetch_assoc();
-    $tipo_acesso = ($ultimo['tipo_acesso'] === "entrada") ? "saida" : "entrada";
+if ($res->num_rows == 0) {
+    die("NEGADO|Sem acesso ao parque");
 }
 
-// INSERIR NOVO REGISTO
-$sql_insert = "INSERT INTO historico_acesso
-               (tipo_acesso, data_hora, estado_parque, mensagem, id_cartao, id_parque)
-               VALUES (?, NOW(), 0, '', ?, ?)";
+/* 3) Calcular lotação atual dinâmica */
+$sqlL = "
+    SELECT  
+        SUM(CASE WHEN tipo_acesso='entrada' THEN 1 ELSE 0 END) AS entradas,
+        SUM(CASE WHEN tipo_acesso='saida' THEN 1 ELSE 0 END) AS saidas
+    FROM acesso
+    WHERE id_parque = ?
+";
+$stmt = $conn->prepare($sqlL);
+$stmt->bind_param("i", $id_parque);
+$stmt->execute();
+$lot = $stmt->get_result()->fetch_assoc();
 
-$stmt_insert = $conn->prepare($sql_insert);
-$stmt_insert->bind_param("sii", $tipo_acesso, $id_cartao, $id_parque);
-$stmt_insert->execute();
+$entradas = intval($lot['entradas'] ?? 0);
+$saidas   = intval($lot['saidas'] ?? 0);
 
-echo json_encode([
-    "status" => "sucesso",
-    "mensagem" => "Acesso registado",
-    "tipo" => $tipo_acesso
-]);
+$atual = $entradas - $saidas;
+if ($atual < 0) $atual = 0;
 
+/* 4) Buscar lotação máxima */
+$sqlM = "SELECT lotacao_maxima FROM parque WHERE id_parque = ?";
+$stmt = $conn->prepare($sqlM);
+$stmt->bind_param("i", $id_parque);
+$stmt->execute();
+$row = $stmt->get_result()->fetch_assoc();
+
+$max = intval($row['lotacao_maxima']);
+
+/* 5) Descobrir último movimento deste cartão */
+$sqlU = "SELECT tipo_acesso FROM acesso WHERE id_cartao=? ORDER BY data_hora_acesso DESC LIMIT 1";
+$stmt = $conn->prepare($sqlU);
+$stmt->bind_param("i", $id_cartao);
+$stmt->execute();
+$res = $stmt->get_result();
+
+$proximo = "entrada";
+if ($res->num_rows > 0) {
+    $ultimo = $res->fetch_assoc()['tipo_acesso'];
+    if ($ultimo == "entrada") $proximo = "saida";
+}
+
+/* 6) Bloquear entrada se o parque estiver cheio */
+if ($proximo == "entrada" && $atual >= $max) {
+    die("NEGADO|Parque cheio");
+}
+
+/* 7) Registrar acesso */
+$sqlI = "INSERT INTO acesso (tipo_acesso, data_hora_acesso, id_cartao, id_parque)
+         VALUES (?, NOW(), ?, ?)";
+$stmt = $conn->prepare($sqlI);
+$stmt->bind_param("sii", $proximo, $id_cartao, $id_parque);
+$stmt->execute();
+
+/* 8) Resposta final para o ESP32 */
+echo "OK|$proximo|$atual|$max";
+
+$conn->close();
 ?>
