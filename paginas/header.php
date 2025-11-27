@@ -21,7 +21,9 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 
     $tipo_user = $_SESSION['tipo'] ?? 'cliente';
 
-    if ($tipo_user === 'Administrador') {
+    // --- CORREÇÃO AQUI ---
+    // Verifica se é o ID 1 (Admin) OU a string 'Administrador'
+    if ($tipo_user == 1 || $tipo_user === 'Administrador') {
         $link_administracao = '/Easy-Park/paginas/administracao/administracao.php';
     } else {
         $link_administracao = '/Easy-Park/paginas/administracao/registoEntradas.php';
@@ -94,7 +96,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
        ========================================= */
     header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-        padding: 15px 0;
+        padding: 20px 0;
         width: 100%;
         position: fixed;
         top: 0;

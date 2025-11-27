@@ -26,78 +26,109 @@ if (session_status() === PHP_SESSION_NONE) {
       color: white;
     }
 
-    nav {
-      display: flex;
-      gap: 35px;
-    }
-
-    nav a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-      position: relative;
-      transition: all 0.3s ease;
-    }
-
-    nav a:hover {
-      transform: translateY(-2px);
-    }
-
-    nav a::after {
-      content: "";
-      position: absolute;
-      bottom: -6px;
-      left: 0;
-      width: 0;
-      height: 2px;
-      background: white;
-      transition: width 0.3s;
-    }
-
-    nav a:hover::after {
-      width: 100%;
-    }
-
     /* ===== CONTEÚDO ===== */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      text-align: center;
-      padding-bottom: 30px;
+      padding-bottom: 50px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     h1 {
       font-size: 42px;
       font-weight: bold;
-      margin-top: 10px;
+      margin-top: 30px;
+      margin-bottom: 30px;
       animation: fadeIn 1s ease;
+      text-align: center;
     }
 
+    /* --- SECÇÃO TOTAL (GRANDE) --- */
+    /* Agora está em cima, ajustei as margens */
+    .total-section {
+        width: 100%;
+        padding: 0 20px;
+        margin-bottom: 40px; /* Espaço em baixo para separar dos pequenos */
+        animation: slideUp 1s ease;
+        display: flex;
+        justify-content: center;
+    }
+
+    .map-card.large {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 1110px;
+        display: flex;
+        flex-direction: row; /* Imagem ao lado do texto */
+        align-items: stretch;
+        transition: transform 0.3s;
+    }
+
+    .map-card.large:hover {
+        transform: translateY(-5px);
+    }
+
+    .map-card.large img {
+        width: 60%;
+        height: auto;
+        min-height: 300px;
+        object-fit: cover;
+        display: block;
+    }
+
+    .map-card.large .map-info {
+        width: 40%;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.9);
+    }
+
+    .map-card.large h3 {
+        color: #1e3a8a;
+        font-size: 32px;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .map-card.large .spots-number {
+        font-size: 48px;
+    }
+
+    /* --- Galeria dos 3 Parques Pequenos --- */
     .map-gallery {
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 40px;
+      gap: 30px;
       flex-wrap: wrap;
-      animation: slideUp 1s ease;
+      animation: slideUp 1.2s ease; /* Animação ligeiramente atrasada */
+      width: 100%;
+      padding: 0 20px;
     }
 
     .map-card {
-      margin-top: 7%;
       background: rgba(255, 255, 255, 0.95);
       border-radius: 20px;
       overflow: hidden;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      width: 360px;
+      width: 350px;
       transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
     }
 
     .map-card img {
       width: 100%;
-      height: 260px;
+      height: 220px;
       display: block;
       object-fit: cover;
     }
@@ -105,6 +136,10 @@ if (session_status() === PHP_SESSION_NONE) {
     .map-info {
       background: rgba(255, 255, 255, 0.9);
       padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
 
     .map-card h3 {
@@ -114,6 +149,7 @@ if (session_status() === PHP_SESSION_NONE) {
       margin: 0 0 15px 0;
     }
 
+    /* --- Estilos Comuns de Disponibilidade --- */
     .availability-info {
       display: flex;
       flex-direction: column;
@@ -152,60 +188,32 @@ if (session_status() === PHP_SESSION_NONE) {
       font-weight: 600;
     }
 
-    .status-disponivel {
-      background: rgba(34, 197, 94, 0.2);
-      color: #16a34a;
-    }
-
-    .status-poucos {
-      background: rgba(234, 179, 8, 0.2);
-      color: #ca8a04;
-    }
-
-    .status-lotado {
-      background: rgba(239, 68, 68, 0.2);
-      color: #dc2626;
-    }
-
-    .status-loading {
-      background: rgba(100, 116, 139, 0.2);
-      color: #64748b;
-    }
+    /* Cores dos Estados */
+    .status-disponivel { background: rgba(34, 197, 94, 0.2); color: #16a34a; }
+    .status-poucos { background: rgba(234, 179, 8, 0.2); color: #ca8a04; }
+    .status-lotado { background: rgba(239, 68, 68, 0.2); color: #dc2626; }
+    .status-loading { background: rgba(100, 116, 139, 0.2); color: #64748b; }
 
     .map-card:hover {
       transform: translateY(-8px);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
+    /* Animações */
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(50px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
+    /* Responsividade */
     @media (max-width: 1000px) {
-      header {
-        padding: 20px 40px;
+      .map-card.large {
+          flex-direction: column;
       }
-
-      h1 {
-        font-size: 32px;
+      .map-card.large img {
+          width: 100%;
+          height: 250px;
       }
-
-      .map-card {
-        width: 300px;
-      }
-
-      .map-card img {
-        height: 220px;
+      .map-card.large .map-info {
+          width: 100%;
       }
     }
   </style>
@@ -215,11 +223,31 @@ if (session_status() === PHP_SESSION_NONE) {
   <?php include('header.php'); ?> 
 
   <main>
-    <h1>Parques de estacionamento</h1>
+    <h1>Parques de Estacionamento</h1>
 
+    <!-- 1. SECÇÃO TOTAL (GRANDE) - AGORA EM CIMA -->
+    <div class="total-section">
+        <div class="map-card large">
+            <img src="../imagens/todos_parques.jpeg" alt="Visão Geral">
+            <div class="map-info">
+            <h3>Todos os Parques</h3>
+            <div class="availability-info">
+                <div class="available-spots">
+                <div>
+                    <div class="spots-number" id="spots-total">--</div>
+                    <div class="spots-label">lugares totais</div>
+                </div>
+                </div>
+                <span class="status-badge status-loading" id="status-total">A carregar...</span>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. GALERIA DE PARQUES INDIVIDUAIS - AGORA EM BAIXO -->
     <div class="map-gallery">
       <div class="map-card">
-        <img src="../imagens/parque1.png" alt="Mapa 1">
+        <img src="../imagens/parque1.jpeg" alt="Mapa 1">
         <div class="map-info">
           <h3>Parque 1</h3>
           <div class="availability-info">
@@ -235,7 +263,7 @@ if (session_status() === PHP_SESSION_NONE) {
       </div>
 
       <div class="map-card">
-        <img src="../imagens/parque2.png" alt="Mapa 2">
+        <img src="../imagens/parque2.jpeg" alt="Mapa 2">
         <div class="map-info">
           <h3>Parque 2</h3>
           <div class="availability-info">
@@ -251,7 +279,7 @@ if (session_status() === PHP_SESSION_NONE) {
       </div>
 
       <div class="map-card">
-        <img src="../imagens/parque3.png" alt="Mapa 3">
+        <img src="../imagens/parque3.jpeg" alt="Mapa 3">
         <div class="map-info">
           <h3>Parque 3</h3>
           <div class="availability-info">
@@ -282,7 +310,7 @@ if (session_status() === PHP_SESSION_NONE) {
         const text = await response.text();
         console.log('📥 Resposta do servidor:', text);
         
-        // Parse manual do formato texto
+        // Parse manual
         const firstPipe = text.indexOf('|');
         const secondPipe = text.indexOf('|', firstPipe + 1);
         const thirdPipe = text.indexOf('|', secondPipe + 1);
@@ -292,23 +320,25 @@ if (session_status() === PHP_SESSION_NONE) {
         const totalAtual = parseInt(text.substring(secondPipe + 1, thirdPipe));
         const parquesStr = text.substring(thirdPipe + 1);
         
-        console.log('📊 Status:', status);
-        console.log('🏢 Parques:', parquesStr);
-        
         if (status === 'SUCCESS') {
-          // Processar cada parque
+          
+          // 1. Atualizar o Cartão GRANDE (Total)
+          const totalDisponivel = totalMax - totalAtual;
+          updateParkingCard('total', totalDisponivel, totalMax);
+
+          // 2. Atualizar Parques Individuais
           const parquesArray = parquesStr.split(';');
           
           parquesArray.forEach(parqueStr => {
             const parts = parqueStr.trim().split('|');
-            const id = parseInt(parts[0]);
-            const max = parseInt(parts[1]);
-            const atual = parseInt(parts[2]);
-            const disponivel = max - atual;
-            
-            console.log(`✅ Parque ${id}: ${disponivel} disponíveis (${atual}/${max})`);
-            
-            updateParkingCard(id, disponivel, max);
+            if(parts.length >= 3) {
+                const id = parseInt(parts[0]);
+                const max = parseInt(parts[1]);
+                const atual = parseInt(parts[2]);
+                const disponivel = max - atual;
+                
+                updateParkingCard(id, disponivel, max);
+            }
           });
           
           console.log('✅ Dados carregados com sucesso');
@@ -319,17 +349,16 @@ if (session_status() === PHP_SESSION_NONE) {
       } catch (error) {
         console.error('❌ Erro ao carregar disponibilidade:', error);
         
-        // Mostrar erro em todos os cards
-        for (let i = 1; i <= 3; i++) {
-          const spotsEl = document.getElementById(`spots-${i}`);
-          const statusEl = document.getElementById(`status-${i}`);
+        ['1', '2', '3', 'total'].forEach(id => {
+          const spotsEl = document.getElementById(`spots-${id}`);
+          const statusEl = document.getElementById(`status-${id}`);
           
           if (spotsEl) spotsEl.textContent = '--';
           if (statusEl) {
             statusEl.textContent = 'Erro ao carregar';
             statusEl.className = 'status-badge status-loading';
           }
-        }
+        });
       }
     }
 
@@ -359,10 +388,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
     // Carregar dados ao iniciar a página
     document.addEventListener('DOMContentLoaded', function() {
-      console.log('🚀 Página carregada, buscando disponibilidade...');
       fetchParkingAvailability();
-      
-      // Atualizar automaticamente a cada 30 segundos
       setInterval(fetchParkingAvailability, 30000);
     });
   </script>

@@ -18,15 +18,21 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPark - Painel Administrativo</title>
     <!-- Atenção aos caminhos do CSS -->
-    <link rel="stylesheet" href="../../css/administracao.css"> 
+    <link rel="stylesheet" href="../../css/administracao.css">
     <style>
-        .logo::before { content: "🚧"; }
-        .chart-section { width: 100%; box-sizing: border-box; }
+        .logo::before {
+            content: "🚧";
+        }
+
+        .chart-section {
+            width: 100%;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 
 <body>
-    
+
     <!-- Inclui a Sidebar Lateral -->
     <?php include 'sidebar.php'; ?>
 
@@ -49,7 +55,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 
         <!-- DASHBOARD COMPLETO -->
         <div id="section-lotacoes" style="display: block;">
-            
+
             <!-- 1. GRID DE ESTATÍSTICAS -->
             <div class="stats-grid">
                 <!-- Lotação Total -->
@@ -209,7 +215,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                 const thirdPipeIndex = text.indexOf('|', secondPipeIndex + 1);
 
                 const status = text.substring(0, firstPipeIndex);
-                
+
                 if (status === 'SUCCESS' && thirdPipeIndex !== -1) {
                     const totalAtual = parseInt(text.substring(secondPipeIndex + 1, thirdPipeIndex));
                     const parquesStr = text.substring(thirdPipeIndex + 1);
@@ -220,14 +226,14 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     const parquesArray = parquesStr.split(';');
                     parquesArray.forEach((parqueStr) => {
                         const parts = parqueStr.trim().split('|');
-                        if(parts.length >= 3){
+                        if (parts.length >= 3) {
                             const id = parseInt(parts[0]);
                             const max = parseInt(parts[1]);
                             const atual = parseInt(parts[2]);
 
                             const el = document.getElementById(`lotacao-${id}`);
                             if (el) el.textContent = atual;
-                            
+
                             const sub = document.getElementById(`subtitle-${id}`);
                             if (sub) sub.textContent = `de ${max} lugares`;
 
@@ -259,23 +265,51 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                 const parts = text.split('|');
                 if (parts[0] === 'SUCCESS') {
                     const el = document.getElementById('entradas-hoje');
-                    if(el) el.textContent = parts[1];
+                    if (el) el.textContent = parts[1];
                 }
             } catch (error) { console.error('Erro entradas:', error); }
         }
 
-        // --- TOTAL UTILIZADORES ---
+        // --- TOTAL UTILIZADORES (CORRIGIDO) ---
         async function fetchTotalUsers() {
             try {
                 const response = await fetch('../../api/get_total_users.php');
-                const text = await response.text();
+                const text = await response.text().then(t => t.trim()); // Remove espaços
+                console.log('Resposta get_total_users:', text); // Debug
+                console.log('Partes separadas:', text.split('|')); // Debug das partes
+
                 const parts = text.split('|');
-                
-                if (parts[0] === 'SUCCESS') {
+
+                if (parts[0] === 'SUCCESS' && parts.length >= 3) {
+                    // O formato é: SUCCESS|total_ativos|total_geral|tipos
+                    const totalAtivos = parts[1].trim();
+                    const totalGeral = parts[2].trim();
+
+                    console.log('Total Ativos:', totalAtivos, 'Total Geral:', totalGeral); // Debug
+
+                    // Atualiza o card com o total de utilizadores ativos
                     const el = document.getElementById('total-users');
-                    if(el) el.textContent = parts[1];
+                    if (el) {
+                        el.textContent = totalAtivos;
+                    }
+
+                    // Atualiza o subtitle - só se totalGeral existir
+                    const subtitle = el?.nextElementSibling;
+                    if (subtitle && subtitle.classList.contains('stat-subtitle')) {
+                        if (totalGeral && totalGeral !== 'undefined') {
+                            subtitle.textContent = `${totalAtivos} ativos de ${totalGeral} total`;
+                        } else {
+                            subtitle.textContent = 'Registados na BD';
+                        }
+                    }
+
+                    console.log(`Utilizadores atualizados: ${totalAtivos} ativos de ${totalGeral} total`);
+                } else {
+                    console.error('Erro na resposta ou formato inválido:', text);
                 }
-            } catch (error) { console.error('Erro total users:', error); }
+            } catch (error) {
+                console.error('Erro ao buscar total users:', error);
+            }
         }
 
         // --- INICIALIZAR GRÁFICO ---
@@ -334,9 +368,9 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
             const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
             const now = new Date();
             const dateStr = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
-            
+
             const sub = document.querySelector('.header-subtitle');
-            if(sub) sub.textContent = dateStr;
+            if (sub) sub.textContent = dateStr;
         }
 
         // --- START ---
@@ -357,4 +391,5 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
         });
     </script>
 </body>
+
 </html>

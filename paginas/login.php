@@ -18,7 +18,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      /* Gradiente de fundo consistente com o resto do site */
       background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
       min-height: 100vh;
       display: flex;
@@ -36,7 +35,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     .auth-card {
       width: 100%;
       max-width: 400px;
-      /* Efeito de vidro (Glassmorphism) */
       background: rgba(255, 255, 255, 0.95);
       border-radius: 24px;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -88,14 +86,13 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
       font-size: 14px;
     }
 
-    /* Inputs com ícone */
     .input-wrapper {
       position: relative;
     }
 
     .input-wrapper input {
       width: 100%;
-      padding: 14px 14px 14px 45px; /* Espaço para o ícone */
+      padding: 14px 14px 14px 45px;
       border-radius: 12px;
       border: 2px solid #e2e8f0;
       font-size: 15px;
@@ -150,7 +147,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
       line-height: 1.5;
     }
 
-    /* Animação de erro */
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-5px); }
@@ -160,12 +156,12 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 </head>
 <body>
 
-  <?php include('header.php'); ?>
+  <?php  include('header.php'); ?>
 
   <main>
     <div class="auth-card">
       <h1>Bem-vindo de volta</h1>
-      <p class="subtitle">Insira as suas credenciais escolares para continuar</p>
+      <p class="subtitle">Insira as suas credenciais IPS para continuar</p>
 
       <!-- ÁREA DE ERROS DINÂMICA -->
       <?php if (isset($_SESSION['login_erro'])): ?>
@@ -173,12 +169,11 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
             <span>⚠️</span>
             <span><?= htmlspecialchars($_SESSION['login_erro']) ?></span>
         </div>
-        <?php unset($_SESSION['login_erro']); // Limpa o erro após mostrar ?>
+        <?php unset($_SESSION['login_erro']); ?>
       <?php endif; ?>
 
       <form action="../api/verifi_login.php" method="post">
         
-        <!-- Campo Email -->
         <div class="form-group">
             <label for="email">Email Institucional</label>
             <div class="input-wrapper">
@@ -186,14 +181,13 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
                   type="email" 
                   id="email" 
                   name="email" 
-                  placeholder="numero@estudantes.ips.pt" 
+                  placeholder="ex: numero@estudantes.ips.pt" 
                   required
                   autocomplete="email">
                 <span class="input-icon">📧</span>
             </div>
         </div>
         
-        <!-- Campo Senha -->
         <div class="form-group">
             <label for="password">Palavra-passe</label>
             <div class="input-wrapper">
