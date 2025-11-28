@@ -255,6 +255,37 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
         .btn-confirm:hover {
             background: #2563eb;
         }
+
+        /* Mobile View */
+        @media (max-width: 952px) {
+            .header { flex-direction: column; align-items: flex-start; }
+            .user-info { width: 100%; justify-content: space-between; margin-top: 10px; }
+            .cards-container { padding: 15px; }
+            .search-bar { flex-direction: column; gap: 10px; }
+            .search-input, .filter-select { width: 100%; }
+
+            .cards-table thead { display: none; }
+            .cards-table, .cards-table tbody, .cards-table tr, .cards-table td { display: block; width: 100%; }
+            
+            .cards-table tr { 
+                margin-bottom: 20px; background: white; 
+                border: 1px solid #e2e8f0; border-radius: 12px; 
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 15px; 
+            }
+            
+            .cards-table td { 
+                padding: 10px 0; border-bottom: 1px solid #f1f5f9; 
+                display: flex; justify-content: space-between; align-items: center; 
+                text-align: right; 
+            }
+            .cards-table td:last-child { border-bottom: none; padding-top: 15px; justify-content: center; }
+            
+            .cards-table td::before { 
+                content: attr(data-label); font-weight: 600; color: #94a3b8; 
+                font-size: 12px; text-transform: uppercase; 
+            }
+            .action-btn { width: 100%; justify-content: center; }
+        }
     </style>
 </head>
 

@@ -292,7 +292,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
 
                 <div class="buttons">
-                    <button type="button" class="btn-back" onclick="window.location.href='index.php'">Voltar</button>
+                    <button type="button" class="btn-back" onclick="window.location.href='../index.php'">Voltar</button>
                     <button type="submit" class="btn-submit">Enviar Sugestão</button>
                 </div>
             </form>
