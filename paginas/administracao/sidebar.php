@@ -40,6 +40,11 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
             <span class="menu-text">Gestão de Cartões</span>
         </a>
 
+        <a href="gerir_avaliacoes.php" class="menu-item">
+            <span class="menu-icon">📝</span>
+            <span class="menu-text">Feedbacks</span>
+        </a>
+
         <a href="#" class="menu-item">
             <span class="menu-item-icon">📝</span>
             <span>Relatórios</span>
