@@ -17,7 +17,6 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPark - Painel Administrativo</title>
-    <!-- Atenção aos caminhos do CSS -->
     <link rel="stylesheet" href="../../css/administracao.css">
     <style>
         .logo::before {
@@ -113,16 +112,39 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     <div class="stat-subtitle">Veículos vs ontem</div>
                 </div>
 
-                <!-- Utilizadores (ATUALIZADO) -->
+                <!-- Utilizadores -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">🧑‍🤝‍🧑</div>
                         <span class="stat-badge badge-success">Total</span>
                     </div>
                     <div class="stat-title">Utilizadores</div>
-                    <!-- Mudei o ID para total-users para ser mais claro -->
                     <div class="stat-value" id="total-users">--</div>
                     <div class="stat-subtitle">Registados na BD</div>
+                </div>
+
+                <!-- Carros (CORRIGIDO) -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">🚙</div>
+                        <span class="stat-badge badge-success">Registados</span>
+                    </div>
+                    <div class="stat-title">Viaturas</div>
+                    <!-- ID Corrigido: total-carros -->
+                    <div class="stat-value" id="total-carros">--</div>
+                    <div class="stat-subtitle">Carros no sistema</div>
+                </div>
+                
+                <!-- Respostas Form (CORRIGIDO) -->
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">📝</div>
+                        <span class="stat-badge badge-success">Feedback</span>
+                    </div>
+                    <div class="stat-title">Sugestões</div>
+                    <!-- ID Corrigido: total-respostas -->
+                    <div class="stat-value" id="total-respostas">--</div>
+                    <div class="stat-subtitle">Respostas recebidas</div>
                 </div>
             </div>
 
@@ -270,46 +292,45 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
             } catch (error) { console.error('Erro entradas:', error); }
         }
 
-        // --- TOTAL UTILIZADORES (CORRIGIDO) ---
+        // --- FETCH TOTAL UTILIZADORES ---
         async function fetchTotalUsers() {
             try {
                 const response = await fetch('../../api/get_total_users.php');
-                const text = await response.text().then(t => t.trim()); // Remove espaços
-                console.log('Resposta get_total_users:', text); // Debug
-                console.log('Partes separadas:', text.split('|')); // Debug das partes
-
+                const text = await response.text().then(t => t.trim());
                 const parts = text.split('|');
 
-                if (parts[0] === 'SUCCESS' && parts.length >= 3) {
-                    // O formato é: SUCCESS|total_ativos|total_geral|tipos
+                if (parts[0] === 'SUCCESS' && parts.length >= 2) {
                     const totalAtivos = parts[1].trim();
-                    const totalGeral = parts[2].trim();
-
-                    console.log('Total Ativos:', totalAtivos, 'Total Geral:', totalGeral); // Debug
-
-                    // Atualiza o card com o total de utilizadores ativos
                     const el = document.getElementById('total-users');
-                    if (el) {
-                        el.textContent = totalAtivos;
-                    }
-
-                    // Atualiza o subtitle - só se totalGeral existir
-                    const subtitle = el?.nextElementSibling;
-                    if (subtitle && subtitle.classList.contains('stat-subtitle')) {
-                        if (totalGeral && totalGeral !== 'undefined') {
-                            subtitle.textContent = `${totalAtivos} ativos de ${totalGeral} total`;
-                        } else {
-                            subtitle.textContent = 'Registados na BD';
-                        }
-                    }
-
-                    console.log(`Utilizadores atualizados: ${totalAtivos} ativos de ${totalGeral} total`);
-                } else {
-                    console.error('Erro na resposta ou formato inválido:', text);
+                    if (el) el.textContent = totalAtivos;
                 }
-            } catch (error) {
-                console.error('Erro ao buscar total users:', error);
-            }
+            } catch (error) { console.error('Erro total users:', error); }
+        }
+
+        // --- [NOVO] FETCH TOTAL CARROS ---
+        async function fetchTotalCarros() {
+            try {
+                const response = await fetch('../../api/get_total_carros.php');
+                const text = await response.text();
+                const parts = text.split('|');
+                if (parts[0].trim() === 'SUCCESS') {
+                    const el = document.getElementById('total-carros');
+                    if(el) el.textContent = parts[1];
+                }
+            } catch (error) { console.error('Erro total carros:', error); }
+        }
+
+        // --- [NOVO] FETCH TOTAL RESPOSTAS ---
+        async function fetchTotalRespostas() {
+            try {
+                const response = await fetch('../../api/get_total_respostas.php');
+                const text = await response.text();
+                const parts = text.split('|');
+                if (parts[0].trim() === 'SUCCESS') {
+                    const el = document.getElementById('total-respostas');
+                    if(el) el.textContent = parts[1];
+                }
+            } catch (error) { console.error('Erro total respostas:', error); }
         }
 
         // --- INICIALIZAR GRÁFICO ---
@@ -379,17 +400,23 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
             fetchUserInfo();
             fetchLotacaoData();
             fetchEntradasHoje();
-            fetchTotalUsers(); // <--- Chama a nova função
+            fetchTotalUsers();
+            
+            // Novas chamadas
+            fetchTotalCarros();
+            fetchTotalRespostas();
+            
             initChart();
 
             // Atualizar dados a cada 30s
             setInterval(() => {
                 fetchLotacaoData();
                 fetchEntradasHoje();
-                fetchTotalUsers(); // <--- Atualiza periodicamente
+                fetchTotalUsers();
+                fetchTotalCarros();
+                fetchTotalRespostas();
             }, 30000);
         });
     </script>
 </body>
-
 </html>
