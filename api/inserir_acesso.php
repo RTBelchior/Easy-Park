@@ -6,12 +6,17 @@ if ($conn->connect_error) {
     die("ERRO|Falha na BD");
 }
 
-$numero_cartao = $_POST['numero_cartao'] ?? null;
-$id_parque = $_POST['id_parque'] ?? 1;
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
+
+// ← AQUI ESTÁ A CORREÇÃO IMPORTANTE
+$numero_cartao = $_POST['numero_cartao'] ?? $_GET['numero_cartao'] ?? null;
+$id_parque     = $_POST['id_parque']     ?? $_GET['id_parque']     ?? 1;
 
 if (!$numero_cartao) {
     die("ERRO|Cartao nao enviado");
 }
+
 
 /* 1) Verificar se o cartão existe e está ativo */
 $sql = "SELECT id_cartao FROM cartoes WHERE numero_cartao = ? AND ativo_cartao = 1";

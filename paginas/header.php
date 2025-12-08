@@ -21,12 +21,11 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 
     $tipo_user = $_SESSION['tipo'] ?? 'cliente';
 
-    // --- CORREÇÃO AQUI ---
     // Verifica se é o ID 1 (Admin) OU a string 'Administrador'
     if ($tipo_user == 1 || $tipo_user === 'Administrador') {
         $link_administracao = '/Easy-Park/paginas/administracao/administracao.php';
     } else {
-        $link_administracao = '/Easy-Park/paginas/administracao/registoEntradas.php';
+        $link_administracao = '/Easy-Park/paginas/utilizadores_acessos.php';
     }
 }
 ?>
@@ -50,17 +49,22 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
             <a href="/Easy-Park/index.php">Início</a>
             <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
             <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
+            
+            <!-- Link Meu Cartão NFC (A classe .menu-item controla a visibilidade) -->
+            <a href="/Easy-Park/paginas/cartao_nfc_virtual.php" class="menu-item">
+                <span class="menu-text">Meu Cartão NFC</span>
+            </a>
 
             <?php if ($mostrar_admin): ?>
                 <!-- Link Dinâmico de Administração -->
                 <a href="<?= $link_administracao ?>">Administração</a>
-                
+
                 <!-- Menu de Utilizador -->
                 <div class="user-dropdown">
                     <div class="user-avatar">
                         <?= $iniciais ?>
                     </div>
-                    
+
                     <div class="dropdown-menu">
                         <div class="dropdown-header">
                             Olá, <?= htmlspecialchars(strtok($_SESSION['nome'], " ")) ?>
@@ -102,7 +106,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         top: 0;
         left: 0;
         z-index: 2000;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     }
 
     body {
@@ -159,7 +163,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         gap: 25px;
     }
 
-    .header-nav > a {
+    .header-nav>a {
         color: white;
         text-decoration: none;
         font-weight: 500;
@@ -168,11 +172,17 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         font-size: 16px;
     }
 
-    .header-nav > a:hover {
+    /* --- REGRA NOVA: ESCONDER "MEU CARTÃO" NO DESKTOP --- */
+    .menu-item {
+        display: none; 
+    }
+    /* ---------------------------------------------------- */
+
+    .header-nav>a:hover {
         transform: translateY(-2px);
     }
 
-    .header-nav > a::after {
+    .header-nav>a::after {
         content: '';
         position: absolute;
         bottom: -5px;
@@ -183,7 +193,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         transition: width 0.3s;
     }
 
-    .header-nav > a:hover::after {
+    .header-nav>a:hover::after {
         width: 100%;
     }
 
@@ -194,7 +204,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         border: 1px solid rgba(255, 255, 255, 0.4);
         color: white !important;
     }
-    
+
     .login-btn:hover {
         background: white;
         color: #1e3a8a !important;
@@ -228,15 +238,15 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     .dropdown-menu {
         display: none;
         position: absolute;
-        top: 100%; 
+        top: 100%;
         right: 0;
         background: white;
         min-width: 200px;
         border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         padding: 10px 0;
         z-index: 2002;
-        margin-top: 5px; 
+        margin-top: 5px;
     }
 
     .user-dropdown:hover .dropdown-menu {
@@ -274,22 +284,33 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         color: #1e3a8a !important;
     }
 
-    .dropdown-item.danger { color: #dc2626 !important; }
-    .dropdown-divider { height: 1px; background-color: #eee; margin: 5px 0; }
+    .dropdown-item.danger {
+        color: #dc2626 !important;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background-color: #eee;
+        margin: 5px 0;
+    }
 
     /* =========================================
        RESPONSIVIDADE (MOBILE) - AJUSTES
        ========================================= */
     @media (max-width: 768px) {
-        
+
+        /* --- REGRA NOVA: MOSTRAR "MEU CARTÃO" NO MOBILE --- */
+        .menu-item {
+            display: block !important; 
+        }
+        /* -------------------------------------------------- */
+
         .header-container {
-            /* AQUI: Aumentei o padding lateral para 40px para o menu parecer "menos largo" */
-            padding: 0 50px; 
+            padding: 0 50px;
         }
 
         .menu-toggle {
             display: flex;
-            /* Se quiseres empurrar ainda mais o botão, usa margin-right, mas o padding acima já ajuda */
         }
 
         /* Menu Mobile */
@@ -300,10 +321,10 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
             top: 100%;
             left: 0;
             width: 100%;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); 
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
             padding: 10px 0;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.3);
-            border-top: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .header-nav.active {
@@ -311,24 +332,24 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
             animation: slideDown 0.3s ease;
         }
 
-        .header-nav > a {
+        .header-nav>a {
             display: block;
             width: 100%;
             text-align: center;
             padding: 15px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff !important;
             font-size: 18px;
             opacity: 1 !important;
             visibility: visible !important;
         }
 
-        .header-nav > a:hover {
-            background-color: rgba(255,255,255,0.1);
+        .header-nav>a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
             transform: none;
         }
 
-        .header-nav > a::after {
+        .header-nav>a::after {
             display: none;
         }
 
@@ -356,14 +377,21 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
             background: white;
             display: none;
         }
-        
+
         .user-dropdown:hover .dropdown-menu {
             display: block;
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     }
 </style>

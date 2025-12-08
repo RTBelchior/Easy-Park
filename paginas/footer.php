@@ -200,9 +200,9 @@
                 <h3>Navegação</h3>
                 <ul class="footer-links">
                     <li><a href="index.php">Página Inicial</a></li>
-                    <li><a href="paginas/saibamais.html">Sobre o Projeto</a></li>
                     <li><a href="paginas/mapa.php">Mapa</a></li>
-                    <li><a href="admin/login.php">Informações</a></li>
+                    <li><a href="paginas/saibamais.php">Sobre o Projeto</a></li>
+                    <li><a href="paginas/formulario.php">Sugestões</a></li>
                 </ul>
             </div>
 

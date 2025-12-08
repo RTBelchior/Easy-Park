@@ -21,10 +21,10 @@ $msg_erro = "";
 $msg_sucesso = "";
 
 $user = null;
-$veiculos = null; // Mudou de $carros para $veiculos
+$veiculos = null;
 $cartoes = null;
 $historico = null;
-$tipos_veiculo = []; // Array para guardar os tipos (Carro, Mota) para o formulário
+$tipos_veiculo = []; 
 
 try {
     // Tenta conectar
@@ -34,7 +34,7 @@ try {
         throw new Exception("Não foi possível estabelecer conexão com a base de dados.");
     }
 
-    // --- 0. BUSCAR TIPOS DE VEÍCULO (Para preencher o Select do formulário) ---
+    // --- 0. BUSCAR TIPOS DE VEÍCULO ---
     $sqlTipos = "SELECT id_tipo_veiculo, nome_tipo_veiculo FROM tipo_veiculo";
     $resTipos = $conn->query($sqlTipos);
     if ($resTipos) {
@@ -49,39 +49,57 @@ try {
     if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['btn_add_veiculo'])) {
         $marca = trim($_POST['marca']);
         $modelo = trim($_POST['modelo']);
-        $matricula = strtoupper(trim($_POST['matricula']));
-        $idTipo = intval($_POST['id_tipo_veiculo']); // Novo campo
+        $idTipo = intval($_POST['id_tipo_veiculo']);
+        
+        // --- INICIO DA CORREÇÃO DA MATRÍCULA ---
+        $matriculaRaw = $_POST['matricula'];
+        // 1. Mete em maiúsculas e remove tudo o que NÃO for letra (A-Z) ou número (0-9)
+        // Isto resolve o problema de "FS 34 FS" (remove os espaços)
+        $matriculaLimpa = preg_replace('/[^A-Z0-9]/', '', strtoupper($matriculaRaw));
 
-        if (!empty($marca) && !empty($modelo) && !empty($matricula) && $idTipo > 0) {
-            // 1. Inserir na tabela 'veiculos' (Incluindo o tipo)
-            $sqlInsert = "INSERT INTO veiculos (marca_veiculos, modelo_veiculos, matricula_veiculos, id_tipo_veiculo) VALUES (?, ?, ?, ?)";
-            $stmtInsert = $conn->prepare($sqlInsert);
+        // 2. Valida se tem exatamente 6 caracteres (padrão 2+2+2)
+        if (strlen($matriculaLimpa) === 6) {
             
-            if ($stmtInsert) {
-                // "sssi" = string, string, string, integer
-                $stmtInsert->bind_param("sssi", $marca, $modelo, $matricula, $idTipo);
+            // 3. Formata para AA-00-AA (insere os traços manualmente)
+            $parte1 = substr($matriculaLimpa, 0, 2);
+            $parte2 = substr($matriculaLimpa, 2, 2);
+            $parte3 = substr($matriculaLimpa, 4, 2);
+            $matriculaFinal = "$parte1-$parte2-$parte3";
+
+            if (!empty($marca) && !empty($modelo) && $idTipo > 0) {
+                // Inserir na tabela 'veiculos'
+                $sqlInsert = "INSERT INTO veiculos (marca_veiculos, modelo_veiculos, matricula_veiculos, id_tipo_veiculo) VALUES (?, ?, ?, ?)";
+                $stmtInsert = $conn->prepare($sqlInsert);
                 
-                if ($stmtInsert->execute()) {
-                    $novoIdVeiculo = $conn->insert_id; 
+                if ($stmtInsert) {
+                    // Usa a $matriculaFinal formatada
+                    $stmtInsert->bind_param("sssi", $marca, $modelo, $matriculaFinal, $idTipo);
                     
-                    // 2. Ligar o veículo ao utilizador na tabela 'veiculos_utilizador'
-                    $sqlLink = "INSERT INTO veiculos_utilizador (id_veiculos, id_utilizador) VALUES (?, ?)";
-                    $stmtLink = $conn->prepare($sqlLink);
-                    $stmtLink->bind_param("ii", $novoIdVeiculo, $userId);
-                    
-                    if ($stmtLink->execute()) {
-                        header("Location: " . $_SERVER['PHP_SELF']);
-                        exit;
+                    if ($stmtInsert->execute()) {
+                        $novoIdVeiculo = $conn->insert_id; 
+                        
+                        // Ligar o veículo ao utilizador
+                        $sqlLink = "INSERT INTO veiculos_utilizador (id_veiculos, id_utilizador) VALUES (?, ?)";
+                        $stmtLink = $conn->prepare($sqlLink);
+                        $stmtLink->bind_param("ii", $novoIdVeiculo, $userId);
+                        
+                        if ($stmtLink->execute()) {
+                            header("Location: " . $_SERVER['PHP_SELF']);
+                            exit;
+                        } else {
+                            $msg_erro = "Erro ao associar viatura ao utilizador.";
+                        }
                     } else {
-                        $msg_erro = "Erro ao associar viatura ao utilizador.";
+                        $msg_erro = "Erro ao registar (Matrícula pode já existir).";
                     }
-                } else {
-                    $msg_erro = "Erro ao registar (Matrícula pode já existir ou erro de BD).";
                 }
+            } else {
+                $msg_erro = "Preencha a marca, modelo e tipo de veículo.";
             }
         } else {
-            $msg_erro = "Preencha todos os campos corretamente.";
+            $msg_erro = "Matrícula inválida. Deve conter 6 letras/números (ex: AA-00-AA).";
         }
+        // --- FIM DA CORREÇÃO DA MATRÍCULA ---
     }
 
     // REMOVER
@@ -123,7 +141,7 @@ try {
         throw new Exception("Utilizador não encontrado.");
     }
 
-    // 2. VEÍCULOS DO UTILIZADOR (JOIN com tipo_veiculo)
+    // 2. VEÍCULOS
     $sqlVeiculos = "
         SELECT v.id_veiculos, v.marca_veiculos, v.modelo_veiculos, v.matricula_veiculos, tv.nome_tipo_veiculo
         FROM veiculos v
@@ -302,16 +320,20 @@ try {
             border: 1px solid #e2e8f0;
         }
 
+        /* --- ALTERAÇÕES CSS NO FORMULÁRIO --- */
         .form-row {
             display: flex;
-            gap: 20px;
+            gap: 20px; /* Aumentado o espaço entre campos */
             flex-wrap: wrap;
+            align-items: flex-end; /* Alinha os inputs pela base */
         }
 
         .form-group {
             flex: 1;
-            min-width: 150px;
+            min-width: 180px; /* Garante tamanho mínimo */
+            margin-bottom: 15px; /* Espaço inferior se quebrar linha */
         }
+        /* ------------------------------------- */
 
         .form-group input, .form-group select {
             width: 100%;
@@ -320,6 +342,7 @@ try {
             border-radius: 8px;
             font-size: 14px;
             background-color: white;
+            box-sizing: border-box; /* Garante que o padding não aumenta a largura total */
         }
 
         .btn-submit-car {
@@ -330,7 +353,7 @@ try {
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 25px;
+            margin-top: 10px;
             font-size: 15px;
         }
         .btn-submit-car:hover { background-color: #15803d; }
@@ -379,22 +402,16 @@ try {
 <div class="container">
     
     <?php if (!empty($system_error)): ?>
-        <!-- EXIBIÇÃO DE ERRO DE SISTEMA -->
         <div class="card card-error">
             <span class="error-icon">⚠️</span>
             <h2 style="justify-content: center; border-bottom: none;">Ops! Algo correu mal.</h2>
             <p style="color: #dc2626; font-weight: bold;"><?= htmlspecialchars($system_error) ?></p>
-            <p style="color: #64748b; margin-top: 15px;">
-                Não foi possível carregar o seu perfil devido a um problema técnico.<br>
-                Por favor, tente novamente mais tarde.
-            </p>
             <button onclick="window.location.reload();" class="btn-add" style="margin-top: 20px;">
                 🔄 Tentar Novamente
             </button>
         </div>
     
     <?php else: ?>
-        <!-- CONTEÚDO NORMAL DO PERFIL -->
 
         <!-- PERFIL -->
         <div class="card">
@@ -423,7 +440,6 @@ try {
                 <form method="POST" action="">
                     <p style="margin-top:0; font-weight:bold; color:#1e3a8a; font-size:16px; margin-bottom: 20px;">Novo Veículo</p>
                     <div class="form-row">
-                        <!-- Novo campo: TIPO DE VEÍCULO -->
                         <div class="form-group">
                             <label style="display:block; margin-bottom:5px; font-size:13px; color:#64748b;">Tipo</label>
                             <select name="id_tipo_veiculo" required>
@@ -444,9 +460,19 @@ try {
                             <label style="display:block; margin-bottom:5px; font-size:13px; color:#64748b;">Modelo</label>
                             <input type="text" name="modelo" placeholder="ex: Série 1" required>
                         </div>
+                        
+                        <!-- CAMPO MATRÍCULA ALTERADO -->
                         <div class="form-group">
                             <label style="display:block; margin-bottom:5px; font-size:13px; color:#64748b;">Matrícula</label>
-                            <input type="text" name="matricula" placeholder="ex: AA-00-BB" style="text-transform:uppercase;" required>
+                            <input 
+                                type="text" 
+                                name="matricula" 
+                                id="inputMatricula"
+                                placeholder="AA-00-AA" 
+                                maxlength="8"
+                                oninput="formatarMatricula(this)"
+                                required
+                            >
                         </div>
                     </div>
                     <button type="submit" name="btn_add_veiculo" class="btn-submit-car">Guardar Veículo</button>
@@ -469,7 +495,6 @@ try {
                     <?php while($v = $veiculos->fetch_assoc()): ?>
                         <tr>
                             <td>
-                                <!-- Ícone ou badge consoante o tipo -->
                                 <?php 
                                     $nomeTipo = strtolower($v['nome_tipo_veiculo']);
                                     if(strpos($nomeTipo, 'moto') !== false || strpos($nomeTipo, 'mota') !== false) {
@@ -483,7 +508,6 @@ try {
                             <td><?= htmlspecialchars($v['modelo_veiculos']) ?></td>
                             <td><span class="matricula"><?= htmlspecialchars($v['matricula_veiculos']) ?></span></td>
                             <td style="text-align: center;">
-                                <!-- Botão de Remover -->
                                 <form method="POST" onsubmit="return confirm('Tem a certeza que deseja remover este veículo?');">
                                     <input type="hidden" name="id_veiculo_remove" value="<?= $v['id_veiculos'] ?>">
                                     <button type="submit" name="btn_remove_veiculo" class="btn-remove" title="Remover Veículo">
@@ -566,7 +590,7 @@ try {
             <?php endif; ?>
         </div>
 
-    <?php endif; // Fim do check de erro de sistema ?>
+    <?php endif; ?>
 
 </div>
 
@@ -582,6 +606,25 @@ try {
                 form.style.display = "none";
             }
         }
+    }
+
+    // --- NOVA FUNÇÃO PARA FORMATAR MATRÍCULA AUTOMATICAMENTE ---
+    function formatarMatricula(input) {
+        // 1. Pega no valor, mete maiúsculas e remove tudo o que não é letra/número
+        let valor = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        
+        // 2. Adiciona o primeiro traço depois do 2º caracter
+        if (valor.length > 2) {
+            valor = valor.substring(0, 2) + '-' + valor.substring(2);
+        }
+        
+        // 3. Adiciona o segundo traço depois do 5º caracter (contando com o traço anterior)
+        if (valor.length > 5) {
+            valor = valor.substring(0, 5) + '-' + valor.substring(5, 7);
+        }
+        
+        // 4. Atualiza o input visualmente
+        input.value = valor;
     }
 </script>
 
