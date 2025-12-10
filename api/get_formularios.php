@@ -11,22 +11,24 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     exit();
 }
 
-$host = '127.0.0.1';
-$port = '3307';
-$db   = 'easypark';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+// Configuração da ligação
+$host = "localhost";
+$utilizador = "root";
+$senha = "";
+$dbname = "easypark";
 
 try {
-    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    // Conexão MySQLi
+    $conn = new mysqli($host, $utilizador, $senha, $dbname);
+    
+    if ($conn->connect_error) {
+        die("ERROR|Falha na conexão: " . $conn->connect_error);
+    }
+    
+    $conn->set_charset("utf8mb4");
 
     // Buscar todos os formulários com informações do utilizador
-    $stmt = $pdo->query("
+    $sql = "
         SELECT 
             f.id_form,
             f.avaliacao_form,
@@ -37,12 +39,25 @@ try {
         FROM formulario f
         INNER JOIN utilizadores u ON f.id_utilizador = u.id_utilizador
         ORDER BY f.data_hora_form DESC
-    ");
+    ";
     
-    $formularios = $stmt->fetchAll();
-    
-    // Retorna em formato JSON
-    echo "SUCCESS|" . json_encode($formularios, JSON_UNESCAPED_UNICODE);
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $formularios = [];
+        
+        while ($row = $result->fetch_assoc()) {
+            $formularios[] = $row;
+        }
+        
+        // Retorna em formato JSON mantendo a estrutura original
+        echo "SUCCESS|" . json_encode($formularios, JSON_UNESCAPED_UNICODE);
+        
+    } else {
+        echo "ERROR|Erro na consulta: " . $conn->error;
+    }
+
+    $conn->close();
 
 } catch (Exception $e) {
     echo "ERROR|" . $e->getMessage();

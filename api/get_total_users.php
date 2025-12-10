@@ -2,35 +2,44 @@
 header('Content-Type: text/plain; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+// Inicia a sessão se ainda não estiver iniciada
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
-$host = '127.0.0.1';
-$port = '3307';
-$db   = 'easypark';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+// Configuração da ligação
+$host = "localhost";
+$utilizador = "root";
+$senha = "";
+$dbname = "easypark";
 
 try {
-    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    // --- LIGAÇÃO NO FORMATO PEDIDO ---
+    if (!isset($_SESSION['id_utilizador'])) {
+        die("ERROR|Não autenticado");
+    }
+    
+    $conn = new mysqli($host, $utilizador, $senha, $dbname);
+    if ($conn->connect_error) {
+        die("ERROR|Falha na conexão: " . $conn->connect_error);
+    }
+    $conn->set_charset("utf8mb4");
+    // --------------------------------
 
-    // Contar total de utilizadores ativos
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM utilizadores WHERE ativo_utilizador = 1");
-    $row = $stmt->fetch();
-    $total_ativos = $row['total'];
+    // 1. Contar total de utilizadores ativos
+    $sqlAtivos = "SELECT COUNT(*) as total FROM utilizadores WHERE ativo_utilizador = 1";
+    $resAtivos = $conn->query($sqlAtivos);
+    $rowAtivos = $resAtivos->fetch_assoc();
+    $total_ativos = $rowAtivos['total'];
     
-    // Contar total geral (incluindo inativos)
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM utilizadores");
-    $row = $stmt->fetch();
-    $total_geral = $row['total'];
+    // 2. Contar total geral (incluindo inativos)
+    $sqlGeral = "SELECT COUNT(*) as total FROM utilizadores";
+    $resGeral = $conn->query($sqlGeral);
+    $rowGeral = $resGeral->fetch_assoc();
+    $total_geral = $rowGeral['total'];
     
-    // Contar por tipo
-    $stmt = $pdo->query("
+    // 3. Contar por tipo
+    $sqlTipos = "
         SELECT 
             tu.tipo_utilizador,
             COUNT(*) as total
@@ -38,18 +47,21 @@ try {
         INNER JOIN tipo_utilizador tu ON u.id_tipo_utilizador = tu.id_tipo_utilizador
         WHERE u.ativo_utilizador = 1
         GROUP BY tu.tipo_utilizador
-    ");
-    $tipos = $stmt->fetchAll();
+    ";
+    $resTipos = $conn->query($sqlTipos);
     
-    // Formatar contagem por tipo: Administrador:1,Aluno:2,Funcionário:1,Professor:1
+    // Formatar contagem por tipo: Administrador:1,Aluno:2,...
     $tipos_formatados = [];
-    foreach ($tipos as $tipo) {
-        $tipos_formatados[] = $tipo['tipo_utilizador'] . ':' . $tipo['total'];
+    if ($resTipos) {
+        while ($row = $resTipos->fetch_assoc()) {
+            $tipos_formatados[] = $row['tipo_utilizador'] . ':' . $row['total'];
+        }
     }
     
     // Retorna: SUCCESS|total_ativos|total_geral|tipos
-    // Exemplo: SUCCESS|4|4|Administrador:1,Aluno:1,Funcionário:1,Professor:1
     echo "SUCCESS|" . $total_ativos . "|" . $total_geral . "|" . implode(',', $tipos_formatados);
+    
+    $conn->close();
 
 } catch (Exception $e) {
     echo "ERROR|" . $e->getMessage();

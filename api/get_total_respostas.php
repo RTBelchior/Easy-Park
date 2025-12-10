@@ -1,6 +1,7 @@
 <?php
 $conn = new mysqli("localhost", "root", "", "easypark");
-if ($conn->connect_error) die("ERROR");
+if ($conn->connect_error)
+    die("ERROR");
 
 // Conta o total de respostas no formulário
 $sql = "SELECT COUNT(*) as total FROM formulario";

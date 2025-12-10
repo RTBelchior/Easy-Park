@@ -38,12 +38,12 @@ try {
 
     while ($row = $result->fetch_assoc()) {
         // Formato linha: ID|MARCA|MODELO|MATRICULA|TIPO
-        $linha = $row['id_veiculos'] . '|' . 
-                 $row['marca_veiculos'] . '|' . 
-                 $row['modelo_veiculos'] . '|' . 
-                 $row['matricula_veiculos'] . '|' . 
-                 $row['nome_tipo_veiculo'];
-        
+        $linha = $row['id_veiculos'] . '|' .
+            $row['marca_veiculos'] . '|' .
+            $row['modelo_veiculos'] . '|' .
+            $row['matricula_veiculos'] . '|' .
+            $row['nome_tipo_veiculo'];
+
         $listaVeiculos[] = $linha;
     }
 

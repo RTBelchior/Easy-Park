@@ -11,22 +11,24 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     exit();
 }
 
-$host = '127.0.0.1';
-$port = '3307';
-$db   = 'easypark';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+// Configuração da ligação
+$host = "localhost";
+$utilizador = "root";
+$senha = "";
+$dbname = "easypark";
 
 try {
-    $dsn = "mysql:host=$host;port=$port;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    // Conexão MySQLi
+    $conn = new mysqli($host, $utilizador, $senha, $dbname);
+
+    if ($conn->connect_error) {
+        die("ERROR|Falha na conexão: " . $conn->connect_error);
+    }
+    
+    $conn->set_charset("utf8mb4");
 
     // Buscar todos os cartões com informações do utilizador
-    $stmt = $pdo->query("
+    $sql = "
         SELECT 
             c.id_cartao,
             c.numero_cartao,
@@ -38,12 +40,25 @@ try {
         FROM cartoes c
         INNER JOIN utilizadores u ON c.id_utilizador = u.id_utilizador
         ORDER BY u.nome_utilizador ASC
-    ");
+    ";
     
-    $cartoes = $stmt->fetchAll();
-    
-    // Retorna em formato JSON
-    echo "SUCCESS|" . json_encode($cartoes, JSON_UNESCAPED_UNICODE);
+    $result = $conn->query($sql);
+
+    if ($result) {
+        $cartoes = [];
+        
+        while ($row = $result->fetch_assoc()) {
+            $cartoes[] = $row;
+        }
+        
+        // Retorna em formato JSON
+        echo "SUCCESS|" . json_encode($cartoes, JSON_UNESCAPED_UNICODE);
+        
+    } else {
+        echo "ERROR|Erro na consulta: " . $conn->error;
+    }
+
+    $conn->close();
 
 } catch (Exception $e) {
     echo "ERROR|" . $e->getMessage();

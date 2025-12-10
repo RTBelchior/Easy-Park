@@ -5,27 +5,26 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['id_utilizador'])) {
-    echo "ERROR|Utilizador não autenticado";
-    exit();
-}
-
-$id_utilizador = $_SESSION['id_utilizador'];
-
-// Configuração DB
-$host = '127.0.0.1';
-$db   = 'easypark';
-$user = 'root';
-$pass = '';
-$port = '3307'; // Muda para '3307' se necessário
-
-$dsn = "mysql:host=$host;port=$port;dbname=$db;charset=utf8mb4";
+// Configuração da ligação
+$host = "localhost";
+$utilizador = "root";
+$senha = "";
+$dbname = "easypark";
 
 try {
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
+    // Verificação de autenticação
+    if (!isset($_SESSION['id_utilizador'])) {
+        die("ERROR|Utilizador não autenticado");
+    }
+
+    $id_utilizador = $_SESSION['id_utilizador'];
+
+    // Conexão MySQLi
+    $conn = new mysqli($host, $utilizador, $senha, $dbname);
+    if ($conn->connect_error) {
+        die("ERROR|Falha na conexão: " . $conn->connect_error);
+    }
+    $conn->set_charset("utf8mb4");
 
     // Query para buscar TODOS os cartões e os seus tipos
     $sql = "
@@ -36,35 +35,46 @@ try {
             tc.tipo_cartao
         FROM cartoes c
         INNER JOIN tipo_cartao tc ON c.id_tipo_cartao = tc.id_tipo_cartao
-        WHERE c.id_utilizador = :id_utilizador
+        WHERE c.id_utilizador = ?
         ORDER BY c.data_registo_cartao DESC
     ";
 
-    $stmt = $pdo->prepare($sql);
-    $stmt->execute([':id_utilizador' => $id_utilizador]);
-    $cartoes = $stmt->fetchAll();
+    $stmt = $conn->prepare($sql);
+    
+    if ($stmt) {
+        $stmt->bind_param("i", $id_utilizador);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    if (!$cartoes) {
-        echo "ERROR|Não tem cartões associados.";
-        exit();
-    }
+        // Verificar se existem resultados
+        if ($result->num_rows > 0) {
+            $listaOutput = [];
 
-    $listaOutput = [];
+            while ($row = $result->fetch_assoc()) {
+                // Formato linha: NUMERO|ATIVO|DATA|TIPO
+                $linha = $row['numero_cartao'] . '|' . 
+                         $row['ativo_cartao'] . '|' . 
+                         $row['data_registo_cartao'] . '|' . 
+                         $row['tipo_cartao'];
+                
+                $listaOutput[] = $linha;
+            }
 
-    foreach ($cartoes as $cartao) {
-        // Formato linha: NUMERO|ATIVO|DATA|TIPO
-        $linha = $cartao['numero_cartao'] . '|' . 
-                 $cartao['ativo_cartao'] . '|' . 
-                 $cartao['data_registo_cartao'] . '|' . 
-                 $cartao['tipo_cartao'];
+            // Retorna: SUCCESS | cartao1;cartao2;cartao3...
+            echo "SUCCESS|" . implode(';', $listaOutput);
+
+        } else {
+            echo "ERROR|Não tem cartões associados.";
+        }
         
-        $listaOutput[] = $linha;
+        $stmt->close();
+    } else {
+        echo "ERROR|Erro na preparação da query: " . $conn->error;
     }
 
-    // Retorna: SUCCESS | cartao1;cartao2;cartao3...
-    echo "SUCCESS|" . implode(';', $listaOutput);
+    $conn->close();
 
-} catch (PDOException $e) {
-    echo "ERROR|Erro DB: " . $e->getMessage();
+} catch (Exception $e) {
+    echo "ERROR|Erro: " . $e->getMessage();
 }
 ?>
