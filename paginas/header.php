@@ -95,9 +95,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 </script>
 
 <style>
-    /* =========================================
-       ESTILOS GERAIS (DESKTOP)
-       ========================================= */
     header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 20px 0;

@@ -1,4 +1,3 @@
-<!-- Início do Footer -->
 <style>
     /* --- CORREÇÃO DO ALINHAMENTO GERAL --- */
     footer .container {
@@ -199,10 +198,10 @@
             <div class="footer-section footer-center">
                 <h3>Navegação</h3>
                 <ul class="footer-links">
-                    <li><a href="index.php">Página Inicial</a></li>
-                    <li><a href="paginas/mapa.php">Mapa</a></li>
-                    <li><a href="paginas/saibamais.php">Sobre o Projeto</a></li>
-                    <li><a href="paginas/formulario.php">Sugestões</a></li>
+                    <li><a href="/Easy-Park/index.php">Página Inicial</a></li>
+                    <li><a href="/Easy-Park/paginas/mapa.php">Mapa</a></li>
+                    <li><a href="/Easy-Park/paginas/saibaMais.php">Sobre o Projeto</a></li>
+                    <li><a href="/Easy-Park/paginas/formulario.php">Sugestões</a></li>
                 </ul>
             </div>
 

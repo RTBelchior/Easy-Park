@@ -1,3 +1,5 @@
+/* css/administracao.css */
+
 * {
     margin: 0;
     padding: 0;
@@ -10,97 +12,6 @@ body {
     display: flex;
     min-height: 100vh;
 }
-
-/* ===== SIDEBAR ===== */
-.sidebar {
-    width: 240px;
-    background: white;
-    padding: 30px 20px;
-    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    /* Isto é importante para o botão sair ficar em baixo */
-    height: 100vh;
-    position: sticky;
-    top: 0;
-}
-
-.logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e3a8a;
-    margin-bottom: 40px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo::before {
-    content: "🚧";
-    font-size: 28px;
-}
-
-.menu-section {
-    margin-bottom: 30px;
-}
-
-.menu-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 10px;
-}
-
-.menu-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
-    border-radius: 10px;
-    color: #64748b;
-    text-decoration: none;
-    font-weight: 500;
-    transition: all 0.2s;
-    margin-bottom: 4px;
-}
-
-.menu-item:hover {
-    background: #f1f5f9;
-    color: #1e3a8a;
-}
-
-.menu-item.active {
-    background: #3b82f6;
-    color: white;
-}
-
-.menu-item-icon {
-    font-size: 20px;
-}
-
-/* --- NOVO: Estilo do Botão Sair --- */
-.sidebar-footer {
-    margin-top: auto;
-    /* Empurra para o fundo */
-    border-top: 1px solid #f1f5f9;
-    padding-top: 20px;
-}
-
-.menu-item.logout {
-    color: #ef4444;
-    /* Vermelho */
-}
-
-.menu-item.logout:hover {
-    background: #fef2f2;
-    color: #dc2626;
-    transform: translateX(5px);
-}
-
-/* ---------------------------------- */
-
 
 /* ===== MAIN CONTENT ===== */
 .main-content {
@@ -276,6 +187,7 @@ body {
     padding: 28px;
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    width: 100%;
 }
 
 .chart-header {
@@ -351,21 +263,10 @@ body {
     background: #94a3b8;
 }
 
+/* Responsividade do Conteúdo Principal */
 @media (max-width: 768px) {
     body {
         flex-direction: column;
-    }
-
-    .sidebar {
-        width: 100%;
-        padding: 20px;
-        height: auto;
-        position: relative;
-    }
-
-    /* Ajuste para o botão sair não ficar estranho no telemóvel */
-    .sidebar-footer {
-        margin-top: 20px;
     }
 
     .stats-grid {

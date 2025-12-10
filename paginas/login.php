@@ -1,6 +1,7 @@
 <?php
 session_start();
-// Se já estiver logado, redireciona
+
+// Se já estiver logado, redireciona para o index
 if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     header("Location: ../index.php");
     exit();
@@ -12,151 +13,15 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>EasyPark - Login</title>
-
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .auth-card {
-      width: 100%;
-      max-width: 400px;
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      padding: 40px 30px;
-      text-align: center;
-      position: relative;
-      border: 1px solid rgba(255,255,255,0.4);
-    }
-
-    h1 {
-      color: #1e3a8a;
-      margin-bottom: 8px;
-      font-size: 26px;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      color: #64748b;
-      margin-bottom: 30px;
-    }
-
-    /* Caixa de Erro */
-    .error-message {
-      background-color: #fef2f2;
-      color: #dc2626;
-      padding: 12px;
-      border-radius: 12px;
-      border: 1px solid #fecaca;
-      font-size: 14px;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      animation: shake 0.5s ease-in-out;
-      text-align: left;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-      text-align: left;
-      position: relative;
-    }
-
-    label {
-      display: block;
-      font-weight: 600;
-      color: #334155;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    .input-wrapper {
-      position: relative;
-    }
-
-    .input-wrapper input {
-      width: 100%;
-      padding: 14px 14px 14px 45px;
-      border-radius: 12px;
-      border: 2px solid #e2e8f0;
-      font-size: 15px;
-      transition: all 0.3s ease;
-      background: #f8fafc;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #94a3b8;
-      font-size: 18px;
-    }
-
-    .input-wrapper input:focus {
-      border-color: #3b82f6;
-      background: #fff;
-      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-      outline: none;
-    }
-
-    .input-wrapper input:focus + .input-icon {
-      color: #3b82f6;
-    }
-
-    .primary-btn {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 16px;
-      margin-top: 10px;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .primary-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-    }
-
-    .footer-note {
-      font-size: 13px;
-      color: #64748b;
-      margin-top: 25px;
-      line-height: 1.5;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-  </style>
+  <link rel="icon" href="../imagens/barreira.png" type="image/x-icon">
+  <link rel="stylesheet" href="../css/login.css">
 </head>
 <body>
 
-  <?php  include('header.php'); ?>
+  <?php 
+    // Verifica se o ficheiro existe antes de incluir para evitar erros fatais
+    if(file_exists('header.php')) include('header.php'); 
+  ?>
 
   <main>
     <div class="auth-card">
@@ -183,6 +48,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
                   name="email" 
                   placeholder="ex: numero@estudantes.ips.pt" 
                   required
+                  value="<?= isset($_SESSION['temp_email']) ? htmlspecialchars($_SESSION['temp_email']) : '' ?>"
                   autocomplete="email">
                 <span class="input-icon">📧</span>
             </div>
@@ -209,7 +75,11 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
       </form>
     </div>
   </main>
-
-  <?php include('footer.php'); ?>
+  
+  <?php 
+    // Limpa o email temporário após mostrar
+    unset($_SESSION['temp_email']);
+    if(file_exists('footer.php')) include('footer.php'); 
+  ?>
 </body>
 </html>

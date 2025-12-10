@@ -3,9 +3,6 @@ session_start();
 header('Content-Type: text/plain; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
 $host = "localhost";
 $utilizador = "root";
 $senha = "";
@@ -17,20 +14,19 @@ try {
     }
     
     $conn = new mysqli($host, $utilizador, $senha, $dbname);
-    
     if ($conn->connect_error) {
-        die("ERROR|Falha na conexão: " . $conn->connect_error);
+        die("ERROR|Falha na conexão");
     }
-    
     $conn->set_charset("utf8mb4");
     
     $id_utilizador = (int)$_SESSION['id_utilizador'];
     
-    // JOIN com tipo_utilizador para obter o tipo
+    // ADICIONEI: u.ativo_utilizador
     $sql = "
         SELECT 
             u.nome_utilizador,
             u.email_utilizador,
+            u.ativo_utilizador,
             tu.tipo_utilizador
         FROM utilizadores u
         INNER JOIN tipo_utilizador tu ON u.id_tipo_utilizador = tu.id_tipo_utilizador
@@ -38,16 +34,13 @@ try {
     
     $result = $conn->query($sql);
     
-    if (!$result) {
-        die("ERROR|Erro na query: " . $conn->error);
-    }
-    
-    if ($result->num_rows > 0) {
+    if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
         
         $nome = $user['nome_utilizador'];
         $email = $user['email_utilizador'] ?? 'sem-email@easypark.pt';
         $tipo = $user['tipo_utilizador'];
+        $ativo = $user['ativo_utilizador']; // Novo campo
         
         // Criar iniciais
         $palavras = explode(' ', $nome);
@@ -57,7 +50,8 @@ try {
             $iniciais = strtoupper(substr($nome, 0, 2));
         }
         
-        echo "SUCCESS|" . $nome . "|" . $tipo . "|" . $iniciais . "|" . $email;
+        // Output: SUCCESS|nome|tipo|iniciais|email|ativo
+        echo "SUCCESS|" . $nome . "|" . $tipo . "|" . $iniciais . "|" . $email . "|" . $ativo;
     } else {
         echo "ERROR|Utilizador não encontrado";
     }
