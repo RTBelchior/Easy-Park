@@ -19,21 +19,21 @@ async function fetchUserInfo() {
     try {
         const response = await fetch('../api/get_user_info.php');
         const text = await response.text();
-        
+
         console.log('User Info Response:', text);
 
         // Formato API: SUCCESS|nome|tipo|iniciais|email|ativo
         const parts = text.split('|');
-        
+
         if (parts[0] === 'SUCCESS') {
             const elNome = document.getElementById('user-nome');
             const elTipo = document.getElementById('user-tipo');
             const elEmail = document.getElementById('user-email');
-            const elEstado = document.getElementById('user-estado'); 
+            const elEstado = document.getElementById('user-estado');
 
-            if(elNome) elNome.textContent = parts[1];
-            if(elTipo) elTipo.textContent = parts[2];
-            if(elEmail) elEmail.textContent = parts[4];
+            if (elNome) elNome.textContent = parts[1];
+            if (elTipo) elTipo.textContent = parts[2];
+            if (elEmail) elEmail.textContent = parts[4];
 
             // Estado da Conta (Badge Colorido)
             if (elEstado) {
@@ -67,27 +67,27 @@ async function fetchCardInfo() {
     try {
         const response = await fetch('../api/get_meu_cartao.php');
         const text = await response.text();
-        
+
         console.log('Cartões Response:', text);
-        
+
         // Separar Status do Conteúdo
         const primeiroPipe = text.indexOf('|');
         const status = text.substring(0, primeiroPipe);
         const dados = text.substring(primeiroPipe + 1);
 
         if (status === 'SUCCESS') {
-            tbody.innerHTML = ''; 
-            
+            tbody.innerHTML = '';
+
             if (dados.trim() === "") {
-                if(table) table.style.display = 'none';
-                if(noCardMsg) noCardMsg.style.display = 'block';
+                if (table) table.style.display = 'none';
+                if (noCardMsg) noCardMsg.style.display = 'block';
                 return;
             }
 
             const cartoes = dados.split(';');
 
             cartoes.forEach(cartaoStr => {
-                if(cartaoStr.trim() === "") return;
+                if (cartaoStr.trim() === "") return;
 
                 const parts = cartaoStr.split('|');
                 // Formato: NUMERO|ATIVO|DATA|TIPO
@@ -109,7 +109,7 @@ async function fetchCardInfo() {
                 }
 
                 // 2. Badge de Estado
-                const estadoHtml = isAtivo 
+                const estadoHtml = isAtivo
                     ? '<span class="badge badge-success" style="background:#dcfce7; color:#166534; padding:4px 8px; border-radius:4px;">Ativo</span>'
                     : '<span class="badge badge-danger" style="background:#fee2e2; color:#991b1b; padding:4px 8px; border-radius:4px;">Inativo</span>';
 
@@ -128,13 +128,13 @@ async function fetchCardInfo() {
                 tbody.innerHTML += row;
             });
 
-            if(table) table.style.display = 'table';
-            if(noCardMsg) noCardMsg.style.display = 'none';
+            if (table) table.style.display = 'table';
+            if (noCardMsg) noCardMsg.style.display = 'none';
 
         } else {
             // Erro ou sem dados
-            if(table) table.style.display = 'none';
-            if(noCardMsg) {
+            if (table) table.style.display = 'none';
+            if (noCardMsg) {
                 noCardMsg.style.display = 'block';
                 if (status === 'ERROR' && dados) noCardMsg.textContent = dados;
             }
@@ -156,12 +156,12 @@ async function fetchVehicles() {
     const noVeiculosMsg = document.getElementById('msg-no-veiculos');
     const table = document.getElementById('tabela-veiculos');
 
-    if(!tbody) return;
+    if (!tbody) return;
 
     try {
         const response = await fetch('../api/get_meus_veiculos.php');
         const text = await response.text();
-        
+
         // Separar Status do Conteúdo
         const primeiroPipe = text.indexOf('|');
         const status = text.substring(0, primeiroPipe);
@@ -169,18 +169,18 @@ async function fetchVehicles() {
 
         if (status === 'SUCCESS') {
             tbody.innerHTML = '';
-            
+
             // Se não houver dados
             if (dados.trim() === "") {
-                if(table) table.style.display = 'none';
-                if(noVeiculosMsg) noVeiculosMsg.style.display = 'block';
+                if (table) table.style.display = 'none';
+                if (noVeiculosMsg) noVeiculosMsg.style.display = 'block';
                 return;
             }
 
             const veiculos = dados.split(';');
 
             veiculos.forEach(vStr => {
-                if(vStr.trim() === "") return;
+                if (vStr.trim() === "") return;
 
                 const parts = vStr.split('|');
                 // Formato: ID|MARCA|MODELO|MATRICULA|TIPO
@@ -193,14 +193,14 @@ async function fetchVehicles() {
                 // 1. Lógica do Badge (Carro vs Mota) - Igual ao PHP original
                 let tipoHtml = '';
                 const nomeTipo = tipoRaw.toLowerCase();
-                
+
                 if (nomeTipo.includes('moto') || nomeTipo.includes('mota')) {
                     tipoHtml = '<span class="badge badge-warning">🛵 Mota</span>';
                 } else {
                     tipoHtml = '<span class="badge badge-info">🚗 Carro</span>';
                 }
 
-                // 2. Construção da Linha HTML usando as tuas classes CSS
+                // 2. Construção da Linha HTML 
                 const row = `
                     <tr>
                         <td>${tipoHtml}</td>
@@ -217,12 +217,12 @@ async function fetchVehicles() {
                 tbody.innerHTML += row;
             });
 
-            if(table) table.style.display = 'table';
-            if(noVeiculosMsg) noVeiculosMsg.style.display = 'none';
+            if (table) table.style.display = 'table';
+            if (noVeiculosMsg) noVeiculosMsg.style.display = 'none';
 
         } else {
-            if(table) table.style.display = 'none';
-            if(noVeiculosMsg) noVeiculosMsg.style.display = 'block';
+            if (table) table.style.display = 'none';
+            if (noVeiculosMsg) noVeiculosMsg.style.display = 'block';
         }
 
     } catch (error) {
@@ -232,7 +232,7 @@ async function fetchVehicles() {
 
 // --- ADICIONAR VEÍCULO (AJAX) ---
 async function handleAddVehicle(e) {
-    e.preventDefault(); 
+    e.preventDefault();
 
     const form = e.target;
     const formData = new FormData(form);
@@ -244,12 +244,12 @@ async function handleAddVehicle(e) {
         btnSubmit.disabled = true;
         const textoOriginal = btnSubmit.textContent;
         btnSubmit.textContent = "A guardar...";
-        
+
         // Limpar mensagens anteriores
-        if(msgDiv) {
+        if (msgDiv) {
             msgDiv.style.display = 'none';
             msgDiv.textContent = '';
-            msgDiv.className = ''; 
+            msgDiv.className = '';
         }
 
         const response = await fetch('../api/adicionar_veiculo.php', {
@@ -258,15 +258,15 @@ async function handleAddVehicle(e) {
         });
 
         const text = await response.text();
-        console.log('Resposta do Servidor:', text); // Vê aqui no F12 se quiseres
+        console.log('Resposta do Servidor:', text); 
 
-        const parts = text.trim().split('|'); 
+        const parts = text.trim().split('|');
 
         // LÓGICA MELHORADA DE ERRO
         if (parts[0] === 'SUCCESS') {
-            form.reset();         
-            toggleCarForm();      
-            fetchVehicles();      
+            form.reset();
+            toggleCarForm();
+            fetchVehicles();
             alert("Veículo adicionado com sucesso!");
         } else {
             // Se parts[1] existir, é um erro formatado (ex: "Matrícula já existe").
@@ -292,13 +292,13 @@ async function handleAddVehicle(e) {
                 alert(mensagemErro);
             }
         }
-        
+
         btnSubmit.textContent = textoOriginal;
         btnSubmit.disabled = false;
 
     } catch (error) {
         console.error('Erro JS:', error);
-        if(msgDiv) {
+        if (msgDiv) {
             msgDiv.textContent = "Erro de conexão ou JavaScript.";
             msgDiv.style.display = 'block';
         }
@@ -309,7 +309,7 @@ async function handleAddVehicle(e) {
 
 // --- REMOVER VEÍCULO ---
 async function deleteVehicle(id) {
-    if(!confirm('Tem a certeza que deseja remover este veículo?')) return;
+    if (!confirm('Tem a certeza que deseja remover este veículo?')) return;
 
     try {
         const formData = new FormData();
@@ -319,7 +319,7 @@ async function deleteVehicle(id) {
             method: 'POST',
             body: formData
         });
-        
+
         const text = await response.text();
         const parts = text.split('|');
 
@@ -344,7 +344,7 @@ function toggleCarForm() {
     if (form) {
         // Limpar mensagens de erro ao abrir/fechar
         const msgDiv = document.getElementById('msg-form-veiculo');
-        if(msgDiv) msgDiv.style.display = 'none';
+        if (msgDiv) msgDiv.style.display = 'none';
 
         if (form.style.display === "none" || form.style.display === "") {
             form.style.display = "block";

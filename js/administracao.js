@@ -109,7 +109,7 @@ async function fetchTotalUsers() {
     } catch (error) { console.error('Erro total users:', error); }
 }
 
-// --- [NOVO] FETCH TOTAL CARROS ---
+// --- FETCH TOTAL CARROS ---
 async function fetchTotalCarros() {
     try {
         const response = await fetch('../../api/get_total_carros.php');
@@ -122,7 +122,7 @@ async function fetchTotalCarros() {
     } catch (error) { console.error('Erro total carros:', error); }
 }
 
-// --- [NOVO] FETCH TOTAL RESPOSTAS ---
+// --- FETCH TOTAL RESPOSTAS ---
 async function fetchTotalRespostas() {
     try {
         const response = await fetch('../../api/get_total_respostas.php');

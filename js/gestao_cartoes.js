@@ -1,7 +1,7 @@
 let allCards = [];
 let currentAction = null;
 
-// Fetch User Info
+// Buscar User Info
 async function fetchUserInfo() {
     try {
         const response = await fetch('../../api/get_user_info.php');
@@ -17,7 +17,7 @@ async function fetchUserInfo() {
     }
 }
 
-// Fetch Cards
+// Buscar Cards
 async function fetchCards() {
     try {
         const response = await fetch('../../api/get_cartoes.php');
@@ -45,7 +45,7 @@ async function fetchCards() {
     }
 }
 
-// Update Stats
+// autalizar Stats
 function updateStats() {
     const total = allCards.length;
     // Verificar tanto string '1' quanto número 1
@@ -60,7 +60,7 @@ function updateStats() {
     document.getElementById('cartoes-inativos').textContent = inativos;
 }
 
-// Render Cards
+// renderizar Cards
 function renderCards(cards) {
     const tbody = document.getElementById('cardsTableBody');
 
@@ -117,7 +117,7 @@ function toggleCardStatus(idCartao, isAtivo, nomeUtilizador, numeroCartao) {
     document.getElementById('confirmModal').classList.add('show');
 }
 
-// Confirm Action
+// Confirmar ação
 document.getElementById('confirmBtn').addEventListener('click', async () => {
     if (!currentAction) return;
 
@@ -153,7 +153,7 @@ function closeModal() {
     currentAction = null;
 }
 
-// Filter Cards
+// Filtrar cartoes 
 function filterCards() {
     const searchText = document.getElementById('searchInput').value.toLowerCase();
     const statusFilter = document.getElementById('filterStatus').value;
@@ -193,7 +193,6 @@ document.getElementById('searchInput').addEventListener('input', filterCards);
 document.getElementById('filterStatus').addEventListener('change', filterCards);
 document.getElementById('filterTipo').addEventListener('change', filterCards);
 
-// Initialize
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserInfo();
     fetchCards();

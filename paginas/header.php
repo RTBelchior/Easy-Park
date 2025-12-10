@@ -3,14 +3,15 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Lógica para definir variáveis quando o utilizador está logado
+// Inicializar variáveis
 $iniciais = '';
-$link_administracao = '';
-$mostrar_admin = false;
+$mostrar_admin = false; // Controla se o user é admin
+$esta_logado = false;   // Controla se está logado (qualquer tipo)
 
 if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
-    $mostrar_admin = true;
+    $esta_logado = true;
 
+    // Obter Iniciais
     $nome = $_SESSION['nome'] ?? 'Utilizador';
     $palavras = explode(' ', $nome);
     if (count($palavras) >= 2) {
@@ -19,25 +20,22 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         $iniciais = strtoupper(substr($nome, 0, 2));
     }
 
+    // Verificar Admin
     $tipo_user = $_SESSION['tipo'] ?? 'cliente';
-
-    // Verifica se é o ID 1 (Admin) OU a string 'Administrador'
+    // Ajusta esta verificação conforme a tua base de dados (ID ou String)
     if ($tipo_user == 1 || $tipo_user === 'Administrador') {
-        $link_administracao = '/Easy-Park/paginas/administracao/administracao.php';
-    } else {
-        $link_administracao = '/Easy-Park/paginas/utilizadores_acessos.php';
+        $mostrar_admin = true;
     }
 }
 ?>
 
 <header>
     <div class="header-container">
-        <!-- Logo -->
         <a href="/Easy-Park/index.php" style="text-decoration:none;">
             <div class="header-logo">EasyPark</div>
         </a>
 
-        <!-- Botão Mobile (Hambúrguer) -->
+        <!-- Botão Mobile -->
         <div class="menu-toggle" onclick="toggleMobileMenu()">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -45,21 +43,23 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         </div>
 
         <nav class="header-nav" id="navMenu">
-            <!-- Links Comuns -->
             <a href="/Easy-Park/index.php">Início</a>
-            <a href="/Easy-Park/paginas/mapa.php">Mapa</a>
-            <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
-            
-            <!-- Link Meu Cartão NFC (A classe .menu-item controla a visibilidade) -->
-            <a href="/Easy-Park/paginas/cartao_nfc_virtual.php" class="menu-item">
-                <span class="menu-text">Meu Cartão NFC</span>
-            </a>
+            <a href="/Easy-Park/paginas/mapa.php">Mapa</a>     
 
-            <?php if ($mostrar_admin): ?>
-                <!-- Link Dinâmico de Administração -->
-                <a href="<?= $link_administracao ?>">Administração</a>
+            <?php if ($esta_logado): ?>
 
-                <!-- Menu de Utilizador -->
+                <a href="/Easy-Park/paginas/cartao_nfc_virtual.php" class="menu-item mobile-only">
+                    <span class="menu-text">Meu Cartão NFC</span>
+                </a>
+
+                <a href="/Easy-Park/paginas/utilizadores_acessos.php">Acessos</a>
+
+                <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
+
+                <?php if ($mostrar_admin): ?>
+                    <a href="/Easy-Park/paginas/administracao/administracao.php">Administração</a>
+                <?php endif; ?>
+
                 <div class="user-dropdown">
                     <div class="user-avatar">
                         <?= $iniciais ?>
@@ -80,7 +80,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
                 </div>
 
             <?php else: ?>
-                <!-- Link de Login -->
                 <a href="/Easy-Park/paginas/login.php" class="login-btn">Login</a>
             <?php endif; ?>
         </nav>
@@ -95,6 +94,13 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 </script>
 
 <style>
+    /* -----------------------------------------------------------
+       CSS PARA CONTROLAR A VISIBILIDADE DO LINK NFC
+    ----------------------------------------------------------- */
+    .mobile-only {
+        display: none !important;
+    }
+
     header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 20px 0;
@@ -168,12 +174,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
         position: relative;
         font-size: 16px;
     }
-
-    /* --- REGRA NOVA: ESCONDER "MEU CARTÃO" NO DESKTOP --- */
-    .menu-item {
-        display: none; 
-    }
-    /* ---------------------------------------------------- */
 
     .header-nav>a:hover {
         transform: translateY(-2px);
@@ -292,15 +292,16 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
     }
 
     /* =========================================
-       RESPONSIVIDADE (MOBILE) - AJUSTES
+       RESPONSIVIDADE (MOBILE)
        ========================================= */
     @media (max-width: 768px) {
 
-        /* --- REGRA NOVA: MOSTRAR "MEU CARTÃO" NO MOBILE --- */
-        .menu-item {
-            display: block !important; 
+        /* --- AQUI O LINK NFC FICA VISÍVEL --- */
+        .mobile-only {
+            display: block !important;
         }
-        /* -------------------------------------------------- */
+
+        /* ---------------------------------------------- */
 
         .header-container {
             padding: 0 50px;

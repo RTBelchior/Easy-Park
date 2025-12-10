@@ -26,6 +26,8 @@ try {
     $conn->set_charset("utf8mb4");
 
     // Buscar TODOS os acessos do utilizador
+    // Adicionei também o nome da universidade caso queiras mostrar no futuro, 
+    // mas o formato base é tipo|data|id_parque
     $sql = "
         SELECT 
             a.tipo_acesso,
@@ -44,13 +46,25 @@ try {
         $stmt->execute();
         $result = $stmt->get_result();
 
-        $acessos = [];
+        $listaOutput = [];
+        
         while ($row = $result->fetch_assoc()) {
-            $acessos[] = $row;
+            // Formato da linha: TIPO|DATA|ID_PARQUE
+            // Exemplo: entrada|2025-10-01 10:00:00|1
+            $linha = $row['tipo_acesso'] . '|' . 
+                     $row['data_hora_acesso'] . '|' . 
+                     $row['id_parque'];
+            
+            $listaOutput[] = $linha;
         }
 
-        // Retorna: SUCCESS | JSON com os dados
-        echo "SUCCESS|" . json_encode($acessos, JSON_UNESCAPED_UNICODE);
+        // Se houver dados, junta tudo com ponto e vírgula
+        if (count($listaOutput) > 0) {
+            echo "SUCCESS|" . implode(';', $listaOutput);
+        } else {
+            // Se não houver histórico, retorna SUCCESS mas vazio depois da barra
+            echo "SUCCESS|"; 
+        }
         
         $stmt->close();
     } else {

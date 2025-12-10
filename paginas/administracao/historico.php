@@ -12,6 +12,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 
 <!DOCTYPE html>
 <html lang="pt">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Essencial para mobile -->
@@ -20,9 +21,10 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <link rel="stylesheet" href="../../css/administracao.css">
     <link rel="stylesheet" href="../../css/historico.css">
 </head>
+
 <body>
     <?php include 'sidebar.php'; ?>
-    
+
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
@@ -115,4 +117,5 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 
     <script src="../../js/historico.js"></script>
 </body>
+
 </html>

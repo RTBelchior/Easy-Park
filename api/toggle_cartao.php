@@ -33,7 +33,7 @@ if ($novo_status !== 0 && $novo_status !== 1) {
 
 $host = '127.0.0.1';
 $port = '3307';
-$db   = 'easypark';
+$db = 'easypark';
 $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';
@@ -51,12 +51,12 @@ try {
         SET ativo_cartao = :status 
         WHERE id_cartao = :id
     ");
-    
+
     $stmt->execute([
         ':status' => $novo_status,
         ':id' => $id_cartao
     ]);
-    
+
     $status_texto = $novo_status === 1 ? 'ativado' : 'desativado';
     echo "SUCCESS|Cartão " . $status_texto . " com sucesso";
 

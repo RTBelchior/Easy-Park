@@ -47,7 +47,6 @@ try {
         $listaVeiculos[] = $linha;
     }
 
-    // Junta tudo com ponto e vírgula
     // Exemplo final: SUCCESS|1|BMW|S1|AA-00-AA|Carro;2|Honda|CB|BB-22-BB|Mota
     echo "SUCCESS|" . implode(';', $listaVeiculos);
 

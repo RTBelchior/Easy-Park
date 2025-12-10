@@ -52,7 +52,8 @@
     .footer-center {
         display: flex;
         flex-direction: column;
-        align-items: center; /* Centra horizontalmente */
+        align-items: center;
+        /* Centra horizontalmente */
     }
 
     /* Centra a linha azul decorativa do título apenas nesta coluna */
@@ -63,8 +64,10 @@
 
     /* Garante que a lista de links fica bonita e centrada como um bloco */
     .footer-center .footer-links {
-        width: fit-content; /* Ocupa apenas o espaço necessário */
-        min-width: 140px;   /* Tamanho mínimo para alinhar bem */
+        width: fit-content;
+        /* Ocupa apenas o espaço necessário */
+        min-width: 140px;
+        /* Tamanho mínimo para alinhar bem */
     }
 
     /* --- LINKS --- */
@@ -156,16 +159,18 @@
         .footer-center {
             display: block;
         }
-        
+
         .footer-center .footer-links {
-            width: 100%; /* Volta a ocupar tudo */
+            width: 100%;
+            /* Volta a ocupar tudo */
         }
-        
-        .footer-links a, .info-list li {
+
+        .footer-links a,
+        .info-list li {
             justify-content: center;
             text-align: center;
         }
-        
+
         .info-list li {
             flex-direction: column;
             align-items: center;
@@ -183,18 +188,18 @@
 <footer class="site-footer">
     <div class="container">
         <div class="footer-content">
-            
+
             <!-- Coluna 1: Sobre o Projeto -->
             <div class="footer-section">
                 <h3>EasyPark</h3>
                 <p>
-                    Um sistema inteligente de gestão de estacionamento escolar. 
-                    Automação, segurança e eficiência para facilitar o dia-a-dia 
+                    Um sistema inteligente de gestão de estacionamento escolar.
+                    Automação, segurança e eficiência para facilitar o dia-a-dia
                     da nossa comunidade educativa.
                 </p>
             </div>
 
-            <!-- Coluna 2: Navegação (AGORA COM CLASSE EXTRA "footer-center") -->
+            <!-- Coluna 2: Navegação -->
             <div class="footer-section footer-center">
                 <h3>Navegação</h3>
                 <ul class="footer-links">

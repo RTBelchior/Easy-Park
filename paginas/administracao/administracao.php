@@ -32,13 +32,10 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 </head>
 
 <body>
-
-    <!-- Inclui a Sidebar Lateral -->
     <?php include 'sidebar.php'; ?>
 
     <!-- CONTEÚDO PRINCIPAL -->
     <main class="main-content">
-        <!-- HEADER -->
         <div class="header">
             <div class="header-title">
                 <h1>Painel Administrativo</h1>
@@ -124,26 +121,24 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
                     <div class="stat-subtitle">Registados na BD</div>
                 </div>
 
-                <!-- Carros (CORRIGIDO) -->
+                <!-- Carros -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">🚙</div>
                         <span class="stat-badge badge-success">Registados</span>
                     </div>
                     <div class="stat-title">Viaturas</div>
-                    <!-- ID Corrigido: total-carros -->
                     <div class="stat-value" id="total-carros">--</div>
                     <div class="stat-subtitle">Carros no sistema</div>
                 </div>
                 
-                <!-- Respostas Form (CORRIGIDO) -->
+                <!-- Respostas Form -->
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">📝</div>
                         <span class="stat-badge badge-success">Feedback</span>
                     </div>
                     <div class="stat-title">Sugestões</div>
-                    <!-- ID Corrigido: total-respostas -->
                     <div class="stat-value" id="total-respostas">--</div>
                     <div class="stat-subtitle">Respostas recebidas</div>
                 </div>

@@ -55,15 +55,13 @@ body {
     gap: 20px;
 }
 
-/* ALTERAÇÃO AQUI: Fundo Azul e Letra Branca */
+/* Fundo Azul e Letra Branca */
 .user-avatar {
     width: 60px;
     height: 60px;
     border-radius: 50%;
     background: #3b82f6;
-    /* Azul sólido */
     color: white;
-    /* Texto branco */
     display: flex;
     align-items: center;
     justify-content: center;

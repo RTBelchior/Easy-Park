@@ -22,7 +22,6 @@ if (session_status() === PHP_SESSION_NONE) {
             <div class="hero-content">
                 <h1>Controlo Inteligente de Acessos</h1>
                 <p>Gere o estacionamento de forma automática e eficiente com tecnologia de ponta</p>
-                <!--<button class="cta-button">Saber Mais</button>-->
                 <a href="paginas/saibaMais.php" class="cta-button">Saber Mais</a>
 
             </div>
@@ -43,14 +42,12 @@ if (session_status() === PHP_SESSION_NONE) {
                 <!-- Filtros de Parques -->
                 <div class="parking-filters">
 
-                    <!-- BLOCO DE "TODOS" EM CIMA -->
                     <div class="filter-card total-card active" onclick="filterParking('all')">
                         <div class="icon">🅿️</div>
                         <div class="name">Todos</div>
                         <div class="count" id="count-all">--</div>
                     </div>
 
-                    <!-- BLOCO DOS OUTROS PARQUES EM BAIXO -->
                     <div class="parking-subfilters">
                         <div class="filter-card" onclick="filterParking('1')">
                             <div class="icon">🗺️</div>

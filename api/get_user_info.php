@@ -21,7 +21,6 @@ try {
     
     $id_utilizador = (int)$_SESSION['id_utilizador'];
     
-    // ADICIONEI: u.ativo_utilizador
     $sql = "
         SELECT 
             u.nome_utilizador,
@@ -40,7 +39,7 @@ try {
         $nome = $user['nome_utilizador'];
         $email = $user['email_utilizador'] ?? 'sem-email@easypark.pt';
         $tipo = $user['tipo_utilizador'];
-        $ativo = $user['ativo_utilizador']; // Novo campo
+        $ativo = $user['ativo_utilizador'];
         
         // Criar iniciais
         $palavras = explode(' ', $nome);

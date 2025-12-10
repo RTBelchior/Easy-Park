@@ -5,7 +5,6 @@ const recordsPerPage = 20;
 // --- FETCH USER INFO ---
 async function fetchUserInfo() {
     try {
-        // Ajusta o caminho da API conforme a tua estrutura
         const response = await fetch('../../api/get_user_info.php');
         const text = await response.text();
         const parts = text.split('|');
@@ -55,8 +54,6 @@ async function buscarAcessos(page = 1) {
         const response = await fetch(`../../api/get_historico_entradas.php?${params}`);
         const text = await response.text();
 
-        // console.log('📥 Resposta:', text);
-
         const parts = text.trim().split('|');
 
         if (parts[0] === 'SUCCESS') {
@@ -93,7 +90,7 @@ function renderizarTabela(recordsData) {
 
     const records = recordsData.split(';');
 
-    // MODIFICADO: Adicionado style="width:100%" para garantir responsividade
+    // Adicionado style="width:100%" para garantir responsividade
     let html = `
                 <table style="width: 100%">
                     <thead>
@@ -122,7 +119,7 @@ function renderizarTabela(recordsData) {
             const badgeClass = tipo === 'entrada' ? 'badge-entrada' : 'badge-saida';
             const tipoText = tipo === 'entrada' ? '🟢 Entrada' : '🔴 Saída';
 
-            // MODIFICADO: Adicionado 'data-label' em cada <td> para a view mobile
+            // Adicionado 'data-label' em cada <td> para a view mobile
             html += `
                         <tr>
                             <td data-label="Data/Hora">${formatarDataHora(dataHora)}</td>

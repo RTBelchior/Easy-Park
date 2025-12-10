@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Configurações de conexão (Idealmente, coloca isto num ficheiro separado db_connect.php)
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -12,7 +11,7 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT); // Habilita reporte d
 
 try {
     $conn = new mysqli($servername, $username, $password, $dbname);
-    $conn->set_charset("utf8mb4"); // utf8mb4 é mais seguro e completo que utf8
+    $conn->set_charset("utf8mb4"); 
 } catch (mysqli_sql_exception $e) {
     // Log do erro real no servidor (não mostrar ao utilizador)
     error_log("Erro de conexão: " . $e->getMessage());
@@ -49,8 +48,8 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // 3. Validação de Domínio IPS
-// Aceita @estudantes.ips.pt, @estsetubal.ips.pt, @ips.pt, etc.
-if (!preg_match("/^.+@(estudantes\.ips\.pt|estsetubal\.ips\.pt|ips\.pt)$/", $email)) {
+// Aceita @estudantes.ips.pt, @estsetubal.ips.pt
+if (!preg_match("/^.+@(estudantes\.ips\.pt|estsetubal\.ips)$/", $email)) {
     $_SESSION['login_erro'] = "Utilize um email institucional válido do IPS.";
     header("Location: ../paginas/login.php");
     exit();
@@ -74,16 +73,15 @@ if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
 
     // 5. Verificar Senha
-    // Se usares hash na BD (RECOMENDADO):
     $senha_valida = password_verify($password_input, $user['password_utilizador']);
-    
+
     // --- MODO INSEGURO (APENAS SE NÃO TIVERES COMO ALTERAR A BD AGORA) ---
     // Se a tua base de dados tem senhas em texto puro (ex: "1234"), 
     // comenta a linha acima e descomenta a linha abaixo. 
     // $senha_valida = ($password_input === $user['password_utilizador']);
 
     if ($senha_valida) {
-        
+
         // 6. Verificar se está ativo
         if ($user['ativo_utilizador'] == 0) {
             $_SESSION['login_erro'] = "A conta está desativada. Contacte a administração.";
@@ -92,7 +90,7 @@ if ($result->num_rows === 1) {
         }
 
         // --- SUCESSO ---
-        
+
         // Regenerar ID da sessão (Proteção contra Session Fixation)
         session_regenerate_id(true);
 

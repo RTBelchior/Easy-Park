@@ -17,6 +17,7 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyPark - Meus Acessos</title>
     <link rel="icon" href="../imagens/barreira.png" type="image/x-icon">
+    <!-- Ligação ao CSS externo -->
     <link rel="stylesheet" href="../css/utilizadores_acessos.css">
 </head>
 
@@ -127,6 +128,8 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
 
     <?php include('footer.php'); ?>
 
+    <!-- Ligação ao JS externo -->
     <script src="../js/utilizadores_acessos.js"></script>
 </body>
+
 </html>

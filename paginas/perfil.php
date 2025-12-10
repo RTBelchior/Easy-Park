@@ -1,13 +1,11 @@
 <?php
 session_start();
 
-// 1. Verifica login
 if (!isset($_SESSION['id_utilizador'])) {
     header("Location: login.php");
     exit;
 }
 
-// 2. Buscar tipos de veículo (Única coisa que mantemos em PHP para facilitar o <select>)
 $host = "localhost";
 $utilizador = "root";
 $senha = "";
@@ -115,7 +113,6 @@ try {
                     </tr>
                 </thead>
                 <tbody id="lista-veiculos-body">
-                    <!-- O JavaScript vai preencher isto mantendo o teu estilo -->
                 </tbody>
             </table>
             

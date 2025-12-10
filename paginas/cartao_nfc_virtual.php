@@ -479,10 +479,8 @@ if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
         let nfcWriter = null;
         let cardData = null;
 
-        // Load User Data
         async function loadUserData() {
             try {
-                // Caminho correto para paginas/cartao_nfc_virtual.php
                 const response = await fetch('../api/get_meu_cartao.php');
                 const text = await response.text();
                 console.log('Resposta completa da API:', text);

@@ -24,7 +24,6 @@ try {
         die("ERROR|Falha na conexão: " . $conn->connect_error);
     }
     $conn->set_charset("utf8mb4");
-    // --------------------------------
 
     // 1. Contar total de utilizadores ativos
     $sqlAtivos = "SELECT COUNT(*) as total FROM utilizadores WHERE ativo_utilizador = 1";

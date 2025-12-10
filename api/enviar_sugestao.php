@@ -47,8 +47,6 @@ try {
     $stmt = $conn->prepare($sql);
     
     if ($stmt) {
-        // 's' para avaliacao (enum é string na bind), 's' sugestao, 's' data, 'i' id_user
-        // Nota: Se avaliacao na BD for ENUM('1','2'...), passamos como string
         $valStr = (string)$avaliacao;
         $stmt->bind_param("sssi", $valStr, $sugestao, $data_hora, $id_utilizador);
         

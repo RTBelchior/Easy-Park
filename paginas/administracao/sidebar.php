@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Verifica se está logado e se é administrador
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     header("Location: ../login.php");
     exit();
@@ -14,14 +13,13 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
 
 <!-- sidebar.php -->
 <aside class="sidebar" id="mySidebar">
-    
+
     <!-- Header da Sidebar com Logo e Botão Mobile -->
     <div class="sidebar-header">
-        <!-- O link agora tem a classe 'logo-link' para alinharmos no CSS -->
         <a href="/Easy-Park/paginas/administracao/administracao.php" class="logo-link">
             <div class="logo">EasyPark</div>
         </a>
-        
+
         <!-- Botão com os 3 traços -->
         <button class="mobile-toggle" onclick="toggleSidebar()">
             <span></span>
@@ -47,11 +45,13 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
                 <span class="menu-item-icon">🚗</span>
                 <span>Gestão de Acessos</span>
             </a>
-            <a href="gestao_cartoes.php" class="menu-item <?php echo ($pagina_atual == 'gestao_cartoes.php') ? 'active' : ''; ?>">
+            <a href="gestao_cartoes.php"
+                class="menu-item <?php echo ($pagina_atual == 'gestao_cartoes.php') ? 'active' : ''; ?>">
                 <span class="menu-icon">💳</span>
                 <span class="menu-text">Gestão de Cartões</span>
             </a>
-            <a href="gerir_avaliacoes.php" class="menu-item <?php echo ($pagina_atual == 'gerir_avaliacoes.php') ? 'active' : ''; ?>">
+            <a href="gerir_avaliacoes.php"
+                class="menu-item <?php echo ($pagina_atual == 'gerir_avaliacoes.php') ? 'active' : ''; ?>">
                 <span class="menu-icon">📝</span>
                 <span class="menu-text">Feedbacks</span>
             </a>
@@ -123,7 +123,9 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         flex: 1;
     }
 
-    .menu-section { margin-bottom: 30px; }
+    .menu-section {
+        margin-bottom: 30px;
+    }
 
     .menu-label {
         font-size: 11px;
@@ -147,9 +149,20 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         margin-bottom: 4px;
     }
 
-    .menu-item:hover { background: #f1f5f9; color: #1e3a8a; }
-    .menu-item.active { background: #3b82f6; color: white; }
-    .menu-item-icon, .menu-icon { font-size: 20px; }
+    .menu-item:hover {
+        background: #f1f5f9;
+        color: #1e3a8a;
+    }
+
+    .menu-item.active {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .menu-item-icon,
+    .menu-icon {
+        font-size: 20px;
+    }
 
     /* Footer / Sair */
     .sidebar-footer {
@@ -158,7 +171,10 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         padding-top: 20px;
     }
 
-    .menu-item.logout { color: #ef4444; }
+    .menu-item.logout {
+        color: #ef4444;
+    }
+
     .menu-item.logout:hover {
         background: #fef2f2;
         color: #dc2626;
@@ -184,7 +200,10 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         border-radius: 3px;
         transition: transform 0.3s cubic-bezier(0.77, 0.2, 0.05, 1.0);
     }
-    .mobile-toggle span:last-child { margin-bottom: 0; }
+
+    .mobile-toggle span:last-child {
+        margin-bottom: 0;
+    }
 
 
     /* =========================================
@@ -205,7 +224,8 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         .sidebar-header {
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Alinhamento Vertical Crucial */
+            align-items: center;
+            /* Alinhamento Vertical Crucial */
             width: 100%;
             margin-bottom: 0;
             height: 100%;
@@ -213,32 +233,41 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
 
         /* LINK DO LOGO */
         .logo-link {
-            display: flex;       /* Torna o link flexível também */
-            align-items: center; /* Alinha o conteúdo (logo div) ao centro do link */
-            height: 40px;        /* Altura fixa ajuda a igualar ao botão */
+            display: flex;
+            /* Torna o link flexível também */
+            align-items: center;
+            /* Alinha o conteúdo (logo div) ao centro do link */
+            height: 40px;
+            /* Altura fixa ajuda a igualar ao botão */
         }
 
         /* LOGO */
         .logo {
             margin-bottom: 0 !important;
-            font-size: 22px; 
+            font-size: 22px;
             display: flex;
-            align-items: center; /* Alinha Emoji com Texto */
-            line-height: 1;      /* Remove espaçamentos estranhos da fonte */
+            align-items: center;
+            /* Alinha Emoji com Texto */
+            line-height: 1;
+            /* Remove espaçamentos estranhos da fonte */
         }
 
         .logo::before {
             font-size: 24px;
-            margin-top: -2px; /* Pequeno ajuste fino visual */
-            margin-right: 8px; /* Espaço entre emoji e texto */
+            margin-top: -2px;
+            /* Pequeno ajuste fino visual */
+            margin-right: 8px;
+            /* Espaço entre emoji e texto */
         }
 
         /* BOTÃO TOGGLE */
         .mobile-toggle {
             display: flex;
             flex-direction: column;
-            justify-content: center; /* Alinha traços verticalmente dentro do botão */
-            height: 40px;            /* Mesma altura que o logo-link */
+            justify-content: center;
+            /* Alinha traços verticalmente dentro do botão */
+            height: 40px;
+            /* Mesma altura que o logo-link */
             padding: 0 0 0 10px;
         }
 
@@ -255,23 +284,32 @@ $pagina_atual = basename($_SERVER['PHP_SELF']);
         /* ESTADO ABERTO */
         .sidebar.mobile-open .sidebar-nav {
             display: flex;
-            min-height: calc(100vh - 70px); 
+            min-height: calc(100vh - 70px);
         }
 
         /* Animação do X */
         .sidebar.mobile-open .mobile-toggle span:first-child {
             transform: rotate(45deg) translate(5px, 6px);
         }
+
         .sidebar.mobile-open .mobile-toggle span:nth-child(2) {
             opacity: 0;
         }
+
         .sidebar.mobile-open .mobile-toggle span:last-child {
             transform: rotate(-45deg) translate(6px, -6px);
         }
     }
 
     @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>

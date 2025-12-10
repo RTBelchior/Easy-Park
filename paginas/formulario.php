@@ -3,7 +3,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Opcional: Verificar se está logado antes de mostrar a página
 if (!isset($_SESSION['id_utilizador'])) {
     header("Location: login.php");
     exit();
@@ -34,8 +33,7 @@ if (!isset($_SESSION['id_utilizador'])) {
                 <p>Ajude-nos a melhorar a experiência EasyPark.</p>
             </div>
 
-            <!-- Div para mensagens de feedback (JS vai controla) -->
-            <!-- style="display:none" para não ocupar espaço inicialmente -->
+            <!-- Div para mensagens de feedback (JS vai controla) INVISIVEL-->
             <div id="msg-feedback" class="alert" style="display:none;"></div>
 
             <form id="form-sugestao">
