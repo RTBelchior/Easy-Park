@@ -48,12 +48,10 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 
             <?php if ($esta_logado): ?>
 
-                <a href="/Easy-Park/paginas/cartao_nfc_virtual.php" class="menu-item mobile-only">
-                    <span class="menu-text">Meu Cartão NFC</span>
-                </a>
-
+                <!-- Link Acessos -->
                 <a href="/Easy-Park/paginas/utilizadores_acessos.php">Acessos</a>
 
+                <!-- Link Sugestões -->
                 <a href="/Easy-Park/paginas/formulario.php">Sugestões</a>
 
                 <?php if ($mostrar_admin): ?>
@@ -94,13 +92,7 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
 </script>
 
 <style>
-    /* -----------------------------------------------------------
-       CSS PARA CONTROLAR A VISIBILIDADE DO LINK NFC
-    ----------------------------------------------------------- */
-    .mobile-only {
-        display: none !important;
-    }
-
+    /* CSS Geral do Header */
     header {
         background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
         padding: 20px 0;
@@ -295,13 +287,6 @@ if (isset($_SESSION['logado']) && $_SESSION['logado'] === true) {
        RESPONSIVIDADE (MOBILE)
        ========================================= */
     @media (max-width: 768px) {
-
-        /* --- AQUI O LINK NFC FICA VISÍVEL --- */
-        .mobile-only {
-            display: block !important;
-        }
-
-        /* ---------------------------------------------- */
 
         .header-container {
             padding: 0 50px;
