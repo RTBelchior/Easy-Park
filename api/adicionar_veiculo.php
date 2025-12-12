@@ -63,6 +63,7 @@ try {
     $conn->set_charset("utf8mb4");
 
     // 6. VERIFICAR DUPLICADOS (Crucial)
+    
     $sqlCheck = "SELECT id_veiculos FROM veiculos WHERE matricula_veiculos = ?";
     $stmtCheck = $conn->prepare($sqlCheck);
     $stmtCheck->bind_param("s", $matriculaFinal);
